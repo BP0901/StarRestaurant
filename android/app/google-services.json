@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "410381691609",
+    "project_id": "starrestaurant-5c67d",
+    "storage_bucket": "starrestaurant-5c67d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:410381691609:android:e23b89489f6faaa041ecc8",
+        "android_client_info": {
+          "package_name": "com.example.star_restaurant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "410381691609-99bd9sudbhi1kh3emu2tuo3c1fc8mqlc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClhUf4LydOfzBpCNp5EqAaQyO3zFL7gVI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "410381691609-99bd9sudbhi1kh3emu2tuo3c1fc8mqlc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
