@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:get/get.dart';
 import 'package:star_restaurant/Controller/LoginController.dart';
-import 'package:star_restaurant/Screen/Manager/ManagerActivity.dart';
 
 class AuthBloc {
   final _loginController = LoginController();
