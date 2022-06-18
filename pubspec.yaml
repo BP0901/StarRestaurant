@@ -40,6 +40,7 @@ dependencies:
   get: ^4.6.1
   flutter_svg: ^1.0.3
   firebase_auth: ^3.3.19
+  flutter_format_money_vietnam: ^0.0.2
 
 dev_dependencies:
   flutter_test:
