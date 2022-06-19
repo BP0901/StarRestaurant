@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:star_restaurant/Screen/Waiter/Components/FoodMenu.dart';
+import 'package:star_restaurant/Screen/Waiter/Components/TableFood.dart';
 
 import '../../Util/Constants.dart';
 
@@ -20,8 +21,8 @@ class _WaiterActivityState extends State<WaiterActivity> {
   }
 
   final List<Widget> _mainBody = [
-    FoodMenu(),
-    const Text("table"),
+    const FoodMenu(),
+    const TableFood(),
   ];
   @override
   Widget build(BuildContext context) {
