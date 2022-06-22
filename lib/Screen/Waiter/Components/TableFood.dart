@@ -50,7 +50,7 @@ class _TableFoodState extends State<TableFood> {
     return GestureDetector(
       onTap: () {
         waiterController.showTableInfo(document, () {
-          Get.to(TableInfomationActivity(idTable: document!.get('id')));
+          Get.to(TableInfomationActivity(tableFood: document));
         }, (msg) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

@@ -44,14 +44,15 @@ class _WaiterActivityState extends State<WaiterActivity> {
             currentIndex: _currentIndex,
             backgroundColor: kSupColor,
             selectedItemColor: kPrimaryColor,
+            unselectedItemColor: Colors.white,
             elevation: 20,
             onTap: onTabTapped,
-            items: [
-              const BottomNavigationBarItem(
+            items: const [
+              BottomNavigationBarItem(
                 icon: Icon(Icons.menu),
                 label: "Menu",
               ),
-              const BottomNavigationBarItem(
+              BottomNavigationBarItem(
                 icon: Icon(Icons.article),
                 label: "Bàn ăn",
               ),

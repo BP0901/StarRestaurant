@@ -19,4 +19,28 @@ class BanAnDAO {
       }
     }
   }
+
+  void confirmOrders(
+      String idT, Function onSuccess, Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection("MonAnTamGoi/$idT/MonAnChoXacNhan")
+        .get()
+        .then((value) {
+      if (value.size != 0) {
+        value.docs.forEach((element) {
+          FirebaseFirestore.instance
+              .collection("MonAnDaXacNhan/$idT/DaXacNhan")
+              .doc()
+              .set(element.data());
+          FirebaseFirestore.instance
+              .collection("MonAnTamGoi/$idT/MonAnChoXacNhan")
+              .doc(element.id)
+              .delete();
+        }); 
+        onSuccess();
+      } else {
+        onfailure("Lỗi: Thêm món ăn trước khi xác nhận");
+      }
+    });
+  }
 }

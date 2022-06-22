@@ -8,4 +8,9 @@ class WaiterController {
       Function(String) onErrorChecked) {
     banAnDAO.checkIsUsingAndUser(document, onSuccess, onErrorChecked);
   }
+
+  void confirmOrders(
+      String idT, Function onSuccess, Function(String) onfailure) {
+    banAnDAO.confirmOrders(idT, onSuccess, onfailure);
+  }
 }
