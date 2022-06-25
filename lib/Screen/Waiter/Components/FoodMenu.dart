@@ -164,7 +164,7 @@ class _FoodMenuState extends State<FoodMenu> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text(
-          discount.toString().toVND(),
+          price.toString().toVND(),
           style: const TextStyle(
             decoration: TextDecoration.lineThrough,
             color: Colors.white,
@@ -173,7 +173,7 @@ class _FoodMenuState extends State<FoodMenu> {
         Padding(
           padding: const EdgeInsets.only(left: 10),
           child: Text(
-            price.toString().toVND(),
+            discount.toString().toVND(),
             style: const TextStyle(
               color: kPrimaryColor,
             ),

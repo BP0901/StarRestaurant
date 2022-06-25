@@ -256,8 +256,8 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
                             onPressed: () {
                               WaiterController waiterController =
                                   WaiterController();
-                              waiterController
-                                  .orderFood(widget.tableFood, document, _amount ,() {
+                              waiterController.orderFood(
+                                  widget.tableFood, document, _amount, () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: FlashMessageScreen(
@@ -305,7 +305,7 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Text(
-          discount.toString().toVND(),
+          price.toString().toVND(),
           style: const TextStyle(
             decoration: TextDecoration.lineThrough,
             color: Colors.white,
@@ -314,7 +314,7 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
         Padding(
           padding: const EdgeInsets.only(left: 10),
           child: Text(
-            price.toString().toVND(),
+            discount.toString().toVND(),
             style: const TextStyle(
               color: kPrimaryColor,
             ),

@@ -28,6 +28,7 @@ class BanAnDAO {
         .then((value) {
       if (value.size != 0) {
         value.docs.forEach((element) {
+          print(element.data());
           FirebaseFirestore.instance
               .collection("MonAnDaXacNhan/$idT/DaXacNhan")
               .doc()
@@ -58,7 +59,8 @@ class BanAnDAO {
           "amount": amount,
           "idFood": food.get('id'),
           "price": price,
-          "name": food.get('name')
+          "name": food.get('name'),
+          "status": "new"
         })
         .then((value) => onSuccess())
         .catchError((onError) {
@@ -81,7 +83,8 @@ class BanAnDAO {
       "amount": amount,
       "idFood": food.get('id'),
       "price": price,
-      "name": food.get('name')
+      "name": food.get('name'),
+      "status": "new"
     }).then((value) {
       _ref.doc(idTable).update({"isUsing": true, "idUser": _user!.uid}).then(
           (value) => onSuccess());
@@ -89,5 +92,105 @@ class BanAnDAO {
       print("err: " + onError.toString());
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
     });
+  }
+
+  void deleteConfirmFoodinTable(DocumentSnapshot? foodConfirm, String idTable,
+      Function onSuccess, Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection('MonAnTamGoi')
+        .doc(idTable)
+        .collection("MonAnChoXacNhan")
+        .doc(foodConfirm!.id)
+        .delete()
+        .then((value) {
+      FirebaseFirestore.instance
+          .collection('MonAnTamGoi')
+          .doc(idTable)
+          .collection("MonAnChoXacNhan")
+          .get()
+          .then((confirmFood) {
+        if (confirmFood.size == 0) {
+          FirebaseFirestore.instance
+              .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+              .get()
+              .then((confirmedFood) {
+            if (confirmedFood.size == 0) {
+              _ref.doc(idTable).update({"isUsing": false, "idUser": ""});
+            }
+          });
+        }
+      });
+      onSuccess();
+    }).catchError((onError) {
+      print("err: " + onError.toString());
+      onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
+    });
+  }
+
+  void updateAmountConfirmFoodinTable(
+      QueryDocumentSnapshot? foodConfirm,
+      String idTable,
+      int amount,
+      Function onSuccess,
+      Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection('MonAnTamGoi')
+        .doc(idTable)
+        .collection("MonAnChoXacNhan")
+        .doc(foodConfirm!.id)
+        .update({"amount": amount})
+        .then((value) => onSuccess())
+        .catchError((onError) {
+          onfailure("Thây đổi số lượng thất bại");
+        });
+  }
+
+  void deleteOrderedFoodinTable(QueryDocumentSnapshot? foodOrdered, idTable,
+      Function onSuccess, Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+        .doc(foodOrdered!.id)
+        .delete()
+        .then((value) {
+      FirebaseFirestore.instance
+          .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+          .get()
+          .then(
+        (foodOrderedData) {
+          if (foodOrderedData.size == 0) {
+            FirebaseFirestore.instance
+                .collection('MonAnTamGoi')
+                .doc(idTable)
+                .collection("MonAnChoXacNhan")
+                .get()
+                .then((foodConfirm) {
+              if (foodConfirm.size == 0) {
+                _ref.doc(idTable).update({"isUsing": false, "idUser": ""});
+              }
+            });
+          }
+        },
+      );
+      onSuccess();
+    }).catchError((onError) {
+      print("err: " + onError.toString());
+      onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
+    });
+  }
+
+  void updateOrderedFoodinTable(
+      QueryDocumentSnapshot? foodOrdered,
+      String idTable,
+      int amount,
+      Function onSuccess,
+      Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+        .doc(foodOrdered!.id)
+        .update({"amount": amount})
+        .then((value) => onSuccess())
+        .catchError((onError) {
+          onfailure("Thây đổi số lượng thất bại");
+        });
   }
 }
