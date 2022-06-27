@@ -16,17 +16,17 @@ class WaiterController {
   }
 
   void orderFood(DocumentSnapshot? tableFood, DocumentSnapshot? food,
-      int amount, Function onSuccess, Function(String) onfailure) {
+      int amount, String note, Function onSuccess, Function(String) onfailure) {
     if (tableFood!.get('isUsing')) {
       if (FirebaseAuth.instance.currentUser!.uid == tableFood.get('idUser')) {
         banAnDAO.addConfirmFood(
-            tableFood.get("id"), food, amount, onSuccess, onfailure);
+            tableFood.get("id"), food, amount, note, onSuccess, onfailure);
       } else {
         onfailure("Bàn này đã có người phục vụ!");
       }
     } else {
       banAnDAO.addConfirmFoodtoNewTable(
-          tableFood.get("id"), food, amount, onSuccess, onfailure);
+          tableFood.get("id"), food, amount, note, onSuccess, onfailure);
     }
   }
 

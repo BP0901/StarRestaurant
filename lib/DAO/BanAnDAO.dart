@@ -46,7 +46,7 @@ class BanAnDAO {
   }
 
   void addConfirmFood(String idTable, DocumentSnapshot? food, int amount,
-      Function onSuccess, Function(String) onfailure) {
+      String note, Function onSuccess, Function(String) onfailure) {
     int price =
         food!.get('discount') == 0 ? food.get('price') : food.get('discount');
 
@@ -60,6 +60,7 @@ class BanAnDAO {
           "idFood": food.get('id'),
           "price": price,
           "name": food.get('name'),
+          "note": note,
           "status": "new"
         })
         .then((value) => onSuccess())
@@ -70,7 +71,7 @@ class BanAnDAO {
   }
 
   void addConfirmFoodtoNewTable(String idTable, DocumentSnapshot? food,
-      int amount, Function onSuccess, Function(String) onfailure) {
+      int amount, String note, Function onSuccess, Function(String) onfailure) {
     int price =
         food!.get('discount') == 0 ? food.get('price') : food.get('discount');
 
@@ -84,6 +85,7 @@ class BanAnDAO {
       "idFood": food.get('id'),
       "price": price,
       "name": food.get('name'),
+      "note": note,
       "status": "new"
     }).then((value) {
       _ref.doc(idTable).update({"isUsing": true, "idUser": _user!.uid}).then(

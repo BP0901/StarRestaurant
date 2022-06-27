@@ -97,26 +97,34 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                           index,
                                           waiterController),
                                       cells: <DataCell>[
-                                        DataCell(Text(
-                                          snapshot.data!.docs[index]
-                                              .get('name'),
-                                          style: TextStyle(
-                                              color: snapshot.data!.docs[index]
-                                                          .get('status') ==
-                                                      "new"
-                                                  ? Colors.white
-                                                  : snapshot.data!.docs[index]
+                                        DataCell(
+                                            Text(
+                                              snapshot.data!.docs[index]
+                                                  .get('name'),
+                                              style: TextStyle(
+                                                  color: snapshot
+                                                              .data!.docs[index]
                                                               .get('status') ==
-                                                          "cooking"
-                                                      ? kPrimaryColor
+                                                          "new"
+                                                      ? Colors.white
                                                       : snapshot.data!
                                                                   .docs[index]
                                                                   .get(
                                                                       'status') ==
-                                                              "done"
-                                                          ? Colors.green
-                                                          : Colors.blue),
-                                        )),
+                                                              "cooking"
+                                                          ? kPrimaryColor
+                                                          : snapshot
+                                                                      .data!
+                                                                      .docs[
+                                                                          index]
+                                                                      .get(
+                                                                          'status') ==
+                                                                  "done"
+                                                              ? Colors.green
+                                                              : Colors.blue),
+                                            ),
+                                            onTap: () => _showFoodDetail(
+                                                context, snapshot, index)),
                                         DataCell(Text(
                                           snapshot.data!.docs[index]
                                               .get('amount')
@@ -151,6 +159,81 @@ class _FoodOrderedState extends State<FoodOrdered> {
         ),
       ),
     );
+  }
+
+  Future<dynamic> _showFoodDetail(BuildContext context,
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshot, int index) {
+    return showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              elevation: 24,
+              backgroundColor: kSupColor,
+              title: Center(
+                child: Text(
+                  snapshot.data!.docs[index].get('name'),
+                  style: const TextStyle(color: kPrimaryColor),
+                ),
+              ),
+              content: SizedBox(
+                height: 120,
+                child: Column(children: [
+                  Row(
+                    children: [
+                      const Text(
+                        "Số lượng: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        snapshot.data!.docs[index].get('amount').toString(),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Giá: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        snapshot.data!.docs[index].get('price').toString(),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Trạng thái: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        snapshot.data!.docs[index].get('status'),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: const [
+                      Text(
+                        "Ghi chú: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          snapshot.data!.docs[index].get('note'),
+                          style: const TextStyle(color: kPrimaryColor),
+                        ),
+                      ],
+                    ),
+                  )
+                ]),
+              ),
+            ));
   }
 
   Widget _headerPage(String idT) {

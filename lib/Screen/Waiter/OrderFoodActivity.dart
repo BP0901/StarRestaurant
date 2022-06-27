@@ -166,6 +166,7 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
   }
 
   Future<dynamic> _buildOrderFoodSheet(DocumentSnapshot<Object?> document) {
+    TextEditingController _noteController = TextEditingController();
     _amount = 1;
     return showModalBottomSheet(
         elevation: 10,
@@ -174,126 +175,140 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
-        builder: (context) => StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) => SizedBox(
-                height: 210,
-                child: Padding(
-                  padding: const EdgeInsets.all(kDefaultPadding),
-                  child: Column(
-                    children: [
+        builder: (context) => Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: SingleChildScrollView(
+                child: StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) =>
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: kDefaultPadding / 2),
-                        child: Text(
-                          widget.tableFood!.get('name'),
-                          textScaleFactor: 2,
-                          style: const TextStyle(
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Món: ",
-                            textScaleFactor: 1.5,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            document.get('name'),
-                            textScaleFactor: 1.5,
+                    padding: const EdgeInsets.all(kDefaultPadding),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(top: kDefaultPadding / 2),
+                          child: Text(
+                            widget.tableFood!.get('name'),
+                            textScaleFactor: 2,
                             style: const TextStyle(
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic),
+                                color: kPrimaryColor,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Số lượng: ",
-                            textScaleFactor: 1.5,
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (_amount != 1) {
-                                    _amount -= 1;
-                                  }
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.arrow_left_sharp,
-                                color: Colors.white,
-                              )),
-                          Text(
-                            "$_amount",
-                            textScaleFactor: 1.5,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _amount += 1;
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.arrow_right_sharp,
-                                color: Colors.white,
-                              )),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: kPrimaryColor,
-                            ),
-                            onPressed: () {
-                              WaiterController waiterController =
-                                  WaiterController();
-                              waiterController.orderFood(
-                                  widget.tableFood, document, _amount, () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: FlashMessageScreen(
-                                        type: "Thông báo",
-                                        content: "Thêm món thành công",
-                                        color: Colors.green),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              }, (msg) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: FlashMessageScreen(
-                                        type: "Thông báo",
-                                        content: msg,
-                                        color: kPrimaryColor),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              });
-                            },
-                            child: const Text(
-                              "Gọi món",
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Món: ",
                               textScaleFactor: 1.5,
                               style: TextStyle(color: Colors.white),
                             ),
-                          )
-                        ],
-                      )
-                    ],
+                            Text(
+                              document.get('name'),
+                              textScaleFactor: 1.5,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Số lượng: ",
+                              textScaleFactor: 1.5,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (_amount != 1) {
+                                      _amount -= 1;
+                                    }
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_left_sharp,
+                                  color: Colors.white,
+                                )),
+                            Text(
+                              "$_amount",
+                              textScaleFactor: 1.5,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _amount += 1;
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_right_sharp,
+                                  color: Colors.white,
+                                )),
+                          ],
+                        ),
+                        const Text(
+                          "Ghi chú: ",
+                          textScaleFactor: 1.5,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        TextField(
+                          controller: _noteController,
+                          maxLines: 8,
+                          keyboardType: TextInputType.multiline,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: kPrimaryColor,
+                              ),
+                              onPressed: () {
+                                WaiterController waiterController =
+                                    WaiterController();
+                                waiterController.orderFood(
+                                    widget.tableFood, document, _amount, _noteController.text.trim(), () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: FlashMessageScreen(
+                                          type: "Thông báo",
+                                          content: "Thêm món thành công",
+                                          color: Colors.green),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                }, (msg) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: FlashMessageScreen(
+                                          type: "Thông báo",
+                                          content: msg,
+                                          color: kPrimaryColor),
+                                      behavior: SnackBarBehavior.floating,
+                                      backgroundColor: Colors.transparent,
+                                      elevation: 0,
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                });
+                              },
+                              child: const Text(
+                                "Gọi món",
+                                textScaleFactor: 1.5,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
