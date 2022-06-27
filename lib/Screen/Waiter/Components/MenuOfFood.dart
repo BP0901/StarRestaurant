@@ -77,6 +77,13 @@ class _MenuOfFoodState extends State<MenuOfFood> {
   Widget _buildHorizonCateItem(int index, DocumentSnapshot? document) {
     if (document != null) {
       return GestureDetector(
+        onLongPress: (() {
+          setState(() {
+            _cateIndex = -1;
+            _foodByCateStream =
+                FirebaseFirestore.instance.collection('MonAn').snapshots();
+          });
+        }),
         onTap: () {
           setState(() {
             _cateIndex = index;

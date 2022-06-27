@@ -27,7 +27,7 @@ class _FoodMenuState extends State<FoodMenu> {
         child: Column(
           children: [
             _findFood(),
-            _isFinding ? _findFoodByName() : MenuOfFood(),
+            _isFinding ? _findFoodByName() : const MenuOfFood(),
           ],
         ),
       ),
