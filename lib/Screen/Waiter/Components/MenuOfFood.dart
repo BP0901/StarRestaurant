@@ -28,27 +28,73 @@ class _MenuOfFoodState extends State<MenuOfFood> {
         child: Column(
       children: [
         SizedBox(
-            height: 150,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: _cateStream,
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+          height: 150,
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _cateIndex = -1;
+                    _foodByCateStream = FirebaseFirestore.instance
+                        .collection('MonAn')
+                        .snapshots();
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                        color:
+                            -1 == _cateIndex ? kPrimaryColor : kSecondaryColor,
+                        borderRadius: BorderRadius.circular(25)),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Material(
+                            child: Image.asset(
+                              "assets/images/allcate.png",
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(8.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                        ),
+                        const Text(
+                          "Tất cả",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
                     ),
-                  );
-                } else {
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: snapshot.data?.docs.length,
-                    itemBuilder: (context, index) => _buildHorizonCateItem(
-                        index, snapshot.data?.docs[index]),
-                  );
-                }
-              },
-            )),
+                  ),
+                ),
+              ),
+              Expanded(
+                  child: StreamBuilder<QuerySnapshot>(
+                stream: _cateStream,
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                      ),
+                    );
+                  } else {
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data?.docs.length,
+                      itemBuilder: (context, index) => _buildHorizonCateItem(
+                          index, snapshot.data?.docs[index]),
+                    );
+                  }
+                },
+              )),
+            ],
+          ),
+        ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
               stream: _foodByCateStream,
@@ -77,13 +123,6 @@ class _MenuOfFoodState extends State<MenuOfFood> {
   Widget _buildHorizonCateItem(int index, DocumentSnapshot? document) {
     if (document != null) {
       return GestureDetector(
-        onLongPress: (() {
-          setState(() {
-            _cateIndex = -1;
-            _foodByCateStream =
-                FirebaseFirestore.instance.collection('MonAn').snapshots();
-          });
-        }),
         onTap: () {
           setState(() {
             _cateIndex = index;
