@@ -195,4 +195,29 @@ class BanAnDAO {
           onfailure("Thây đổi số lượng thất bại");
         });
   }
+
+  void changeTable(String fromTableId, String toTableId, Function onSuccess,
+      Function(String) onfailure) {
+    FirebaseFirestore.instance
+        .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
+        .get()
+        .then((value) {
+      value.docs.forEach((orderedFood) {
+        FirebaseFirestore.instance
+            .collection("MonAnDaXacNhan/$toTableId/DaXacNhan")
+            .add(orderedFood.data());
+        FirebaseFirestore.instance
+            .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
+            .doc(orderedFood.id)
+            .delete();
+      });
+    }).whenComplete(() {
+      _ref.doc(fromTableId).update({"isUsing": false, "idUser": ""});
+      _ref.doc(toTableId).update({"isUsing": true, "idUser": _user!.uid});
+      onSuccess();
+    }).catchError((err) {
+      print("err: " + err.toString());
+      onfailure("Chuyển bàn thất bại!");
+    });
+  }
 }

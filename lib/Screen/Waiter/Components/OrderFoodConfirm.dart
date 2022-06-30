@@ -1,10 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/WaiterController.dart';
 import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
-import 'package:star_restaurant/Screen/Waiter/OrderFoodActivity.dart';
+import 'package:star_restaurant/Screen/Waiter/Components/MenuBottonInTable.dart';
 
 import '../../../Util/Constants.dart';
 
@@ -141,11 +140,8 @@ class _OrderFoodConfirmState extends State<OrderFoodConfirm> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimaryColor,
-        onPressed: () => Get.to(OrderFoodActivity(tableFood: widget.tableFood)),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton:
+          buildMenuButton(widget.tableFood, context, waiterController),
     );
   }
 
@@ -455,6 +451,7 @@ class _OrderFoodConfirmState extends State<OrderFoodConfirm> {
   }
 
   Widget _headerPage(String idT) {
+    bool hasData = false;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -469,73 +466,104 @@ class _OrderFoodConfirmState extends State<OrderFoodConfirm> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 10, top: 10),
-          child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: kPrimaryColor, width: 2),
-              ),
-              onPressed: () => showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                        backgroundColor: kSupColor,
-                        content: const Text(
-                          'Xác nhận gọi món',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, 'Hủy'),
-                            child: const Text(
-                              'Hủy',
-                              style: TextStyle(color: kPrimaryColor),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              WaiterController waiterController =
-                                  WaiterController();
-                              waiterController.confirmOrders(idT, () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: FlashMessageScreen(
-                                        type: "Thông báo",
-                                        content: "Xác nhận thành công!",
-                                        color: Colors.green),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              }, (msg) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: FlashMessageScreen(
-                                        type: "Thông báo",
-                                        content: msg,
-                                        color: kPrimaryColor),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              });
-                            },
-                            child: const Text(
-                              'Có',
-                              style: TextStyle(color: kPrimaryColor),
-                            ),
-                          ),
-                        ],
+        StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection("MonAnTamGoi/$idT/MonAnChoXacNhan")
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                  ),
+                );
+              } else {
+                hasData = snapshot.data!.size == 0 ? false : true;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 10, top: 10),
+                  child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                            color: hasData ? Colors.green : kPrimaryColor,
+                            width: 2),
+                      ),
+                      onPressed: hasData
+                          ? () => showDialog(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                    backgroundColor: kSupColor,
+                                    content: const Text(
+                                      'Xác nhận gọi món',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, 'Hủy'),
+                                        child: const Text(
+                                          'Hủy',
+                                          style:
+                                              TextStyle(color: kPrimaryColor),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          WaiterController waiterController =
+                                              WaiterController();
+                                          waiterController.confirmOrders(idT,
+                                              () {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: FlashMessageScreen(
+                                                    type: "Thông báo",
+                                                    content:
+                                                        "Xác nhận thành công!",
+                                                    color: Colors.green),
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                elevation: 0,
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          }, (msg) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: FlashMessageScreen(
+                                                    type: "Thông báo",
+                                                    content: msg,
+                                                    color: kPrimaryColor),
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                elevation: 0,
+                                              ),
+                                            );
+                                            Navigator.pop(context);
+                                          });
+                                        },
+                                        child: const Text(
+                                          'Có',
+                                          style:
+                                              TextStyle(color: kPrimaryColor),
+                                        ),
+                                      ),
+                                    ],
+                                  ))
+                          : null,
+                      child: Text(
+                        "Xác nhận",
+                        textScaleFactor: 2,
+                        style: TextStyle(
+                            color: hasData ? Colors.green : kPrimaryColor),
                       )),
-              child: const Text(
-                "Xác nhận",
-                textScaleFactor: 2,
-                style: TextStyle(color: kPrimaryColor),
-              )),
-        )
+                );
+              }
+            }),
       ],
     );
   }

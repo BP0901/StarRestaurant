@@ -77,4 +77,9 @@ class WaiterController {
           foodOrdered, idTable, amount, onSuccess, onfailure);
     }
   }
+
+  void changeToNewTable(String fromTableId, String toTableId,
+      Function onSuccess, Function(String) onfailure) {
+    banAnDAO.changeTable(fromTableId,toTableId,onSuccess,onfailure);
+  }
 }
