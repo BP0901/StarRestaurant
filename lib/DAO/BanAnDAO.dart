@@ -49,13 +49,14 @@ class BanAnDAO {
       String note, Function onSuccess, Function(String) onfailure) {
     int price =
         food!.get('discount') == 0 ? food.get('price') : food.get('discount');
-
+    Timestamp orderTime = Timestamp.fromDate(DateTime.now());
     FirebaseFirestore.instance
         .collection('MonAnTamGoi')
         .doc(idTable)
         .collection("MonAnChoXacNhan")
         .doc()
         .set({
+          "orderTime": orderTime,
           "amount": amount,
           "idFood": food.get('id'),
           "price": price,
@@ -74,13 +75,14 @@ class BanAnDAO {
       int amount, String note, Function onSuccess, Function(String) onfailure) {
     int price =
         food!.get('discount') == 0 ? food.get('price') : food.get('discount');
-
+    Timestamp orderTime = Timestamp.fromDate(DateTime.now());
     FirebaseFirestore.instance
         .collection('MonAnTamGoi')
         .doc(idTable)
         .collection("MonAnChoXacNhan")
         .doc()
         .set({
+      "orderTime": orderTime,
       "amount": amount,
       "idFood": food.get('id'),
       "price": price,
@@ -217,7 +219,7 @@ class BanAnDAO {
       onSuccess();
     }).catchError((err) {
       print("err: " + err.toString());
-      onfailure("Chuyển bàn thất bại!");
+      // onfailure("Chuyển bàn thất bại!");
     });
   }
 }

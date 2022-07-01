@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/WaiterController.dart';
-import 'package:star_restaurant/Screen/Waiter/Components/MenuBottonInTable.dart';
+import 'package:star_restaurant/Screen/Waiter/Components/MenuButtonInTable.dart';
+import 'package:intl/intl.dart';
 
 import '../../../Util/Constants.dart';
 
@@ -166,6 +167,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
 
   Future<dynamic> _showFoodDetail(BuildContext context,
       AsyncSnapshot<QuerySnapshot<Object?>> snapshot, int index) {
+    DateTime orderTime = snapshot.data!.docs[index].get('orderTime').toDate();
+    String formattedDate = DateFormat('dd-MM-yyyy – kk:mm').format(orderTime);
     return showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -200,6 +203,18 @@ class _FoodOrderedState extends State<FoodOrdered> {
                       ),
                       Text(
                         snapshot.data!.docs[index].get('price').toString(),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Giờ: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        formattedDate,
                         style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],

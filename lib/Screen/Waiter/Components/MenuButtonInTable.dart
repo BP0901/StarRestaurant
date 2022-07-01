@@ -9,34 +9,46 @@ import 'package:star_restaurant/Screen/Waiter/OrderFoodActivity.dart';
 
 import '../../../Util/Constants.dart';
 
-SpeedDial buildMenuButton(DocumentSnapshot? tableFood, BuildContext context,
+buildMenuButton(DocumentSnapshot? tableFood, BuildContext context,
     WaiterController waiterController) {
   bool isUsingTable = tableFood!.get('isUsing');
-  return SpeedDial(
-    animatedIcon: AnimatedIcons.menu_close,
-    backgroundColor: kPrimaryColor,
-    overlayColor: Colors.black,
-    overlayOpacity: .4,
-    children: [
-      SpeedDialChild(
-        child: const FaIcon(FontAwesomeIcons.plus),
-        label: "Thêm món",
-        onTap: () => Get.to(OrderFoodActivity(tableFood: tableFood)),
-      ),
-      SpeedDialChild(
-        visible: isUsingTable,
-        child: const FaIcon(FontAwesomeIcons.arrowRightArrowLeft),
-        label: "Chuyển bàn",
-        onTap: () {
-          _changeToNewTable(context, tableFood, waiterController);
-        },
-      ),
-      SpeedDialChild(
-        child: const FaIcon(FontAwesomeIcons.arrowsLeftRightToLine),
-        label: "Ghép bàn",
-      ),
-    ],
-  );
+  return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection("BanAn")
+          .doc(tableFood.id)
+          .snapshots(),
+      builder: (context, snapshot) {
+        bool isPaying = false;
+        if (snapshot.hasData) {
+          isPaying = snapshot.data!.get("isPaying");
+        }
+        return SpeedDial(
+          animatedIcon: AnimatedIcons.menu_close,
+          backgroundColor: kPrimaryColor,
+          overlayColor: Colors.black,
+          overlayOpacity: .4,
+          children: [
+            SpeedDialChild(
+              visible: !isPaying,
+              child: const FaIcon(FontAwesomeIcons.plus),
+              label: "Thêm món",
+              onTap: () => Get.to(OrderFoodActivity(tableFood: tableFood)),
+            ),
+            SpeedDialChild(
+              visible: isUsingTable,
+              child: const FaIcon(FontAwesomeIcons.arrowRightArrowLeft),
+              label: "Chuyển bàn",
+              onTap: () {
+                _changeToNewTable(context, tableFood, waiterController);
+              },
+            ),
+            SpeedDialChild(
+              child: const FaIcon(FontAwesomeIcons.arrowsLeftRightToLine),
+              label: "Ghép bàn",
+            ),
+          ],
+        );
+      });
 }
 
 Future<dynamic> _changeToNewTable(BuildContext context,
