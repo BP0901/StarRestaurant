@@ -73,4 +73,9 @@ class NhanVien {
         role: role,
         disable: disable);
   }
+
+  @override
+  String toString() {
+    return "Tên" + name;
+  }
 }

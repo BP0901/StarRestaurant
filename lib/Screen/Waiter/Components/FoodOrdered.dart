@@ -31,133 +31,129 @@ class _FoodOrderedState extends State<FoodOrdered> {
     WaiterController waiterController = WaiterController();
     return Scaffold(
       body: Material(
-        child: Expanded(
-          child: Container(
-            color: kSupColor,
-            child: Column(children: [
-              _headerPage(_idT),
-              StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection("MonAnDaXacNhan/$_idT/DaXacNhan")
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                        ),
-                      );
-                    } else {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          columns: const [
-                            DataColumn(
-                              label: Text(
-                                'Món ăn',
-                                textScaleFactor: 1.5,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontStyle: FontStyle.italic),
-                              ),
+        child: Container(
+          color: kSupColor,
+          child: Column(children: [
+            _headerPage(_idT),
+            StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection("MonAnDaXacNhan/$_idT/DaXacNhan")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                      ),
+                    );
+                  } else {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(
+                            label: Text(
+                              'Món ăn',
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontStyle: FontStyle.italic),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'SL',
-                                textScaleFactor: 1.5,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontStyle: FontStyle.italic),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'SL',
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontStyle: FontStyle.italic),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Giá',
-                                textScaleFactor: 1.5,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontStyle: FontStyle.italic),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Giá',
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontStyle: FontStyle.italic),
                             ),
-                            DataColumn(
-                              label: Text(
-                                'Tổng',
-                                textScaleFactor: 1.5,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontStyle: FontStyle.italic),
-                              ),
+                          ),
+                          DataColumn(
+                            label: Text(
+                              'Tổng',
+                              textScaleFactor: 1.5,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontStyle: FontStyle.italic),
                             ),
-                          ],
-                          rows: List<DataRow>.generate(
-                              snapshot.data!.size,
-                              (index) => DataRow(
-                                      onLongPress: () => _changeOrDelFood(
-                                          context,
-                                          snapshot,
-                                          index,
-                                          waiterController),
-                                      cells: <DataCell>[
-                                        DataCell(
-                                            Text(
-                                              snapshot.data!.docs[index]
-                                                  .get('name'),
-                                              style: TextStyle(
-                                                  color: snapshot
-                                                              .data!.docs[index]
+                          ),
+                        ],
+                        rows: List<DataRow>.generate(
+                            snapshot.data!.size,
+                            (index) => DataRow(
+                                    onLongPress: () => _changeOrDelFood(context,
+                                        snapshot, index, waiterController),
+                                    cells: <DataCell>[
+                                      DataCell(
+                                        Text(
+                                          snapshot.data!.docs[index]
+                                              .get('name'),
+                                          style: TextStyle(
+                                              color: snapshot.data!.docs[index]
+                                                          .get('status') ==
+                                                      "new"
+                                                  ? Colors.white
+                                                  : snapshot.data!.docs[index]
                                                               .get('status') ==
-                                                          "new"
-                                                      ? Colors.white
+                                                          "cooking"
+                                                      ? kPrimaryColor
                                                       : snapshot.data!
                                                                   .docs[index]
                                                                   .get(
                                                                       'status') ==
-                                                              "cooking"
-                                                          ? kPrimaryColor
-                                                          : snapshot
-                                                                      .data!
-                                                                      .docs[
-                                                                          index]
-                                                                      .get(
-                                                                          'status') ==
-                                                                  "done"
-                                                              ? Colors.green
-                                                              : Colors.blue),
-                                            ),
-                                            onTap: () => _showFoodDetail(
-                                                context, snapshot, index)),
-                                        DataCell(Text(
-                                          snapshot.data!.docs[index]
-                                              .get('amount')
-                                              .toString(),
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        )),
-                                        DataCell(Text(
-                                          snapshot.data!.docs[index]
-                                              .get('price')
-                                              .toString()
-                                              .toVND(),
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        )),
-                                        DataCell(Text(
-                                          _getTotal(
-                                              snapshot.data!.docs[index]
-                                                  .get('amount'),
-                                              snapshot.data!.docs[index]
-                                                  .get('price')),
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        )),
-                                      ])),
-                        ),
-                      );
-                    }
-                  }),
-            ]),
-          ),
+                                                              "done"
+                                                          ? Colors.green
+                                                          : Colors.blue),
+                                        ),
+                                        onTap: () => _showFoodDetail(
+                                            context, snapshot, index),
+                                        onLongPress: () => _changeOrDelFood(
+                                            context,
+                                            snapshot,
+                                            index,
+                                            waiterController),
+                                      ),
+                                      DataCell(Text(
+                                        snapshot.data!.docs[index]
+                                            .get('amount')
+                                            .toString(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )),
+                                      DataCell(Text(
+                                        snapshot.data!.docs[index]
+                                            .get('price')
+                                            .toString()
+                                            .toVND(),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )),
+                                      DataCell(Text(
+                                        _getTotal(
+                                            snapshot.data!.docs[index]
+                                                .get('amount'),
+                                            snapshot.data!.docs[index]
+                                                .get('price')),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      )),
+                                    ])),
+                      ),
+                    );
+                  }
+                }),
+          ]),
         ),
       ),
       floatingActionButton:
@@ -314,15 +310,14 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                         onPressed: () {
                                           WaiterController waiterController =
                                               WaiterController();
-                                          waiterController.confirmOrders(idT,
-                                              () {
+                                          waiterController.payTheBill(idT, () {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
                                                 content: FlashMessageScreen(
                                                     type: "Thông báo",
                                                     content:
-                                                        "Xác nhận thành công",
+                                                        "Gửi yêu cầu thanh toán thành công",
                                                     color: Colors.green),
                                                 behavior:
                                                     SnackBarBehavior.floating,

@@ -99,15 +99,21 @@ class _OrderFoodConfirmState extends State<OrderFoodConfirm> {
                                       },
                                       cells: <DataCell>[
                                         DataCell(
-                                            Text(
-                                              snapshot.data!.docs[index]
-                                                  .get('name'),
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ), onTap: () {
-                                          _showFoodDetail(
-                                              context, snapshot, index);
-                                        }),
+                                          Text(
+                                            snapshot.data!.docs[index]
+                                                .get('name'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          onTap: () {
+                                            _showFoodDetail(
+                                                context, snapshot, index);
+                                          },
+                                          onLongPress: () {
+                                            _changeOrDelFood(context, snapshot,
+                                                index, waiterController);
+                                          },
+                                        ),
                                         DataCell(Text(
                                           snapshot.data!.docs[index]
                                               .get('amount')

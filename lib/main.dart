@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:star_restaurant/Model/NhanVien.dart';
 import 'package:star_restaurant/Screen/Login/LoginActivity.dart';
 
 void main() async {

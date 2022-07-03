@@ -80,6 +80,10 @@ class WaiterController {
 
   void changeToNewTable(String fromTableId, String toTableId,
       Function onSuccess, Function(String) onfailure) {
-    banAnDAO.changeTable(fromTableId,toTableId,onSuccess,onfailure);
+    banAnDAO.changeTable(fromTableId, toTableId, onSuccess, onfailure);
+  }
+
+  void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
+    banAnDAO.payTheBill(idT, onSuccess, onfailure);
   }
 }

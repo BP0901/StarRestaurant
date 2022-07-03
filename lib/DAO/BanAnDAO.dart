@@ -200,26 +200,82 @@ class BanAnDAO {
 
   void changeTable(String fromTableId, String toTableId, Function onSuccess,
       Function(String) onfailure) {
+    // Duyệt món ăn từ bàn hiện tại
     FirebaseFirestore.instance
         .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
         .get()
         .then((value) {
       value.docs.forEach((orderedFood) {
+        // Thêm món ăn vào bàn mới
         FirebaseFirestore.instance
             .collection("MonAnDaXacNhan/$toTableId/DaXacNhan")
             .add(orderedFood.data());
+        // Xóa món ăn bàn hiện tại
         FirebaseFirestore.instance
             .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
             .doc(orderedFood.id)
             .delete();
       });
     }).whenComplete(() {
+      // Cập nhật user phục vụ bàn ăn
       _ref.doc(fromTableId).update({"isUsing": false, "idUser": ""});
       _ref.doc(toTableId).update({"isUsing": true, "idUser": _user!.uid});
       onSuccess();
     }).catchError((err) {
       print("err: " + err.toString());
       // onfailure("Chuyển bàn thất bại!");
+    });
+  }
+
+  void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
+    // Tạo hóa đơn mới
+    Timestamp payTime = Timestamp.fromDate(DateTime.now());
+    FirebaseFirestore.instance.collection("HoaDon").add({
+      "date": payTime,
+      "total": 0,
+      "idWaiter": _user!.uid,
+      "idCashier": "",
+      "status": "unpaid"
+    }).then((bill) {
+      // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
+      FirebaseFirestore.instance
+          .collection("MonAnDaXacNhan/$idT/DaXacNhan")
+          .get()
+          .then((orderedFood) {
+        int total = 0; // tổng tiền các món ăn
+        orderedFood.docs.forEach((food) {
+          // Kiểm tra nếu món đã có thì cập nhật số lượng hoặc thêm mới
+          FirebaseFirestore.instance
+              .collection("ChiTietHoaDon")
+              .where("idBill", isEqualTo: bill.id)
+              .get()
+              .then((value) {
+            print(value.size);
+            if (value.size == 0) {
+              // Thêm mới
+
+              FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
+                "idBill": bill.id,
+                "idFood": food.get('idFood'),
+                "amount": food.get('amount'),
+                "price": food.get('price')
+              });
+            } else {
+              int amount = value.docs[0].get('amount') + food.get('amount');
+              // Cập nhật lại số lượng
+
+              FirebaseFirestore.instance
+                  .collection("ChiTietHoaDon")
+                  .doc(value.docs[0].id)
+                  .update({"amount": amount});
+            }
+          });
+        });
+      });
+    }).whenComplete(() {
+      // Chuyển trạng thái bàn thành đang thanh toán
+
+      _ref.doc(idT).update({"isPaying": true});
     });
   }
 }
