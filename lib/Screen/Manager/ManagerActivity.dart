@@ -10,7 +10,7 @@ class ManagerActivity extends StatefulWidget {
   const ManagerActivity({Key? key}) : super(key: key);
 
   @override
-    State<ManagerActivity> createState() => _ManagermentActivityState();
+  State<ManagerActivity> createState() => _ManagermentActivityState();
 }
 
 class _ManagermentActivityState extends State<ManagerActivity> {
@@ -18,8 +18,9 @@ class _ManagermentActivityState extends State<ManagerActivity> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: kAppBarColor,
-        appBar: AppBar(title: const Text("Trang quản lý thông tin")),
+        appBar: AppBar(
+            backgroundColor: kAppBarColor,
+            title: const Text("Trang quản lý thông tin")),
         drawer: DrawerMGTM(),
         body: SafeArea(
           child: Container(
@@ -32,7 +33,7 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
                             StaffPage() //you can send parameters using constructor
-                    ));
+                        ));
                   },
                   color: Colors.blue,
                   padding: const EdgeInsets.all(8.0),
@@ -43,8 +44,8 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                   press: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                        MenuPage() //you can send parameters using constructor
-                    ));
+                            MenuPage() //you can send parameters using constructor
+                        ));
                   },
                   color: Colors.blue,
                   padding: const EdgeInsets.all(8.0),
@@ -56,7 +57,7 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
                             TablePage() //you can send parameters using constructor
-                    ));
+                        ));
                   },
                   color: Colors.blue,
                   padding: const EdgeInsets.all(8.0),
@@ -71,5 +72,3 @@ class _ManagermentActivityState extends State<ManagerActivity> {
     );
   }
 }
-
-

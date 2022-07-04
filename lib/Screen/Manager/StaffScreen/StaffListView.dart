@@ -187,7 +187,6 @@ class _staffList extends State<StaffList> {
                 itemBuilder: (context, index) =>
                     _buildStaffItem(index, snapshot.data?.docs[index]),
               );
-              ;
             }
           }),
     );
