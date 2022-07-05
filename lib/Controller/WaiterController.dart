@@ -86,4 +86,6 @@ class WaiterController {
   void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
     banAnDAO.payTheBill(idT, onSuccess, onfailure);
   }
+
+  
 }

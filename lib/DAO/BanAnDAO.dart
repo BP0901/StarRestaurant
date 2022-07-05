@@ -232,50 +232,79 @@ class BanAnDAO {
     Timestamp payTime = Timestamp.fromDate(DateTime.now());
     FirebaseFirestore.instance.collection("HoaDon").add({
       "date": payTime,
+      "idTable": idT,
       "total": 0,
       "idWaiter": _user!.uid,
       "idCashier": "",
       "status": "unpaid"
     }).then((bill) {
       // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
+      List<Map<String, dynamic>> list = [];
       FirebaseFirestore.instance
           .collection("MonAnDaXacNhan/$idT/DaXacNhan")
           .get()
           .then((orderedFood) {
-        int total = 0; // tổng tiền các món ăn
         orderedFood.docs.forEach((food) {
-          // Kiểm tra nếu món đã có thì cập nhật số lượng hoặc thêm mới
-          FirebaseFirestore.instance
-              .collection("ChiTietHoaDon")
-              .where("idBill", isEqualTo: bill.id)
-              .get()
-              .then((value) {
-            print(value.size);
-            if (value.size == 0) {
-              // Thêm mới
+          list.add(food.data());
+        });
 
-              FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
-                "idBill": bill.id,
-                "idFood": food.get('idFood'),
-                "amount": food.get('amount'),
-                "price": food.get('price')
-              });
-            } else {
-              int amount = value.docs[0].get('amount') + food.get('amount');
-              // Cập nhật lại số lượng
-
-              FirebaseFirestore.instance
-                  .collection("ChiTietHoaDon")
-                  .doc(value.docs[0].id)
-                  .update({"amount": amount});
+        List<Map<String, dynamic>> checkedList = []; // list món ăn đã duyệt
+        // Duyệt qua từng món ăn đã gọi
+        for (int i = 0; i < list.length; i++) {
+          bool flag = false; // biến kiểm tra món ăn trùng nhau
+          checkedList.forEach((element) {
+            if (element["idFood"] == list[i]["idFood"]) {
+              flag = true;
             }
           });
+          if (flag) {
+            // nếu đã có món ăn trong checkedList
+            continue;
+          } else {
+            // nếu chưa có món ăn trong checkedList
+            List<Map<String, dynamic>> temp = [];
+            temp.add(list[i]); // thêm mới vào món ăn mới đầu tiên
+            for (int j = i + 1; j < list.length; j++) {
+              // kiểm tra thêm vào tất cả các món ăn giống nhau
+              if (list[i]["idFood"] == list[j]["idFood"]) {
+                temp.add(list[j]);
+              }
+            }
+            // rút về 1 món với tổng số lượng
+            Map<String, dynamic> temp1 = temp[0];
+            dynamic amount = 0;
+            temp.forEach((food) {
+              amount += food["amount"];
+            });
+            temp1["amount"] = amount;
+            checkedList
+                .add(temp1); // Thêm món đã cập nhật số lượng vào checkedList
+          }
+        }
+        dynamic total = 0;
+        checkedList.forEach((check) {
+          //Duyệt checkedList để lưu vào ChiTietHoaDon và tổng tiền cảu bill
+          total += check['amount'] * check['price'];
+          FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
+            "idBill": bill.id,
+            "idFood": check['idFood'],
+            "amount": check['amount'],
+            "price": check['price']
+          });
         });
+        FirebaseFirestore.instance
+            .collection("HoaDon")
+            .doc(bill.id)
+            .update({"total": total});
       });
     }).whenComplete(() {
       // Chuyển trạng thái bàn thành đang thanh toán
 
       _ref.doc(idT).update({"isPaying": true});
+      onSuccess();
+    }).catchError((onError) {
+      print("err: " + onError.toString());
+      onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
     });
   }
 }

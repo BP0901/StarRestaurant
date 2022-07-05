@@ -290,7 +290,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                       onPressed: hasData
                           ? () => showDialog(
                               context: context,
-                              builder: (BuildContext context) => AlertDialog(
+                              builder: (ConfirmDialogContext) => AlertDialog(
                                     backgroundColor: kSupColor,
                                     title: const Text(
                                       'Yêu cầu thanh toán?',
@@ -326,7 +326,6 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                                 elevation: 0,
                                               ),
                                             );
-                                            Navigator.pop(context);
                                           }, (msg) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
@@ -342,8 +341,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                                 elevation: 0,
                                               ),
                                             );
-                                            Navigator.pop(context);
                                           });
+                                          Navigator.pop(ConfirmDialogContext);
                                         },
                                         child: const Text(
                                           'OK',
