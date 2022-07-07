@@ -1,0 +1,169 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:star_restaurant/Util/Constants.dart';
+
+class BillDetailActivity extends StatefulWidget {
+  final DocumentSnapshot? bill;
+  final String tableName;
+  const BillDetailActivity(
+      {Key? key, required this.bill, required this.tableName})
+      : super(key: key);
+
+  @override
+  State<BillDetailActivity> createState() => _BillDetailActivityState();
+}
+
+class _BillDetailActivityState extends State<BillDetailActivity> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Material(
+        color: kSupColor,
+        child: SafeArea(
+            child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, top: 10),
+                  child: Text(
+                    widget.tableName,
+                    textScaleFactor: 2,
+                    style: const TextStyle(
+                      color: kPrimaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: kPrimaryColor, width: 2),
+                      ),
+                      child: const Text(
+                        "Xác nhận",
+                        textScaleFactor: 2,
+                        style: TextStyle(color: kPrimaryColor),
+                      ),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                        onPressed: () {},
+                        icon: const FaIcon(
+                          FontAwesomeIcons.print,
+                          color: kPrimaryColor,
+                        )),
+                  ],
+                ),
+              ],
+            ),
+            _billDetail(),
+          ],
+        )),
+      ),
+    );
+  }
+
+  StreamBuilder<QuerySnapshot<Object?>> _billDetail() {
+    return StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("ChiTietHoaDon")
+            .where("idBill", isEqualTo: widget.bill!.id)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              ),
+            );
+          } else {
+            return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  columns: const [
+                    DataColumn(
+                      label: Text(
+                        'Món ăn',
+                        textScaleFactor: 1.5,
+                        style: TextStyle(
+                            color: Colors.white, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'SL',
+                        textScaleFactor: 1.5,
+                        style: TextStyle(
+                            color: Colors.white, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Giá',
+                        textScaleFactor: 1.5,
+                        style: TextStyle(
+                            color: Colors.white, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        'Tổng',
+                        textScaleFactor: 1.5,
+                        style: TextStyle(
+                            color: Colors.white, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ],
+                  rows: List<DataRow>.generate(
+                      snapshot.data!.size,
+                      (index) => DataRow(
+                            cells: <DataCell>[
+                              DataCell(StreamBuilder<DocumentSnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("MonAn")
+                                      .doc(snapshot.data!.docs[index]
+                                          .get('idFood'))
+                                      .snapshots(),
+                                  builder: (context, food) {
+                                    return Text(
+                                      food.data?.get("name") ?? "Lỗi",
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    );
+                                  })),
+                              DataCell(Text(
+                                snapshot.data!.docs[index]
+                                    .get('amount')
+                                    .toString(),
+                                style: const TextStyle(color: Colors.white),
+                              )),
+                              DataCell(Text(
+                                snapshot.data!.docs[index]
+                                    .get('price')
+                                    .toString()
+                                    .toVND(),
+                                style: const TextStyle(color: Colors.white),
+                              )),
+                              DataCell(Text(
+                                _getTotal(
+                                    snapshot.data!.docs[index].get('amount'),
+                                    snapshot.data!.docs[index].get('price')),
+                                style: const TextStyle(color: Colors.white),
+                              )),
+                            ],
+                          )),
+                ));
+          }
+        });
+  }
+
+  String _getTotal(amount, price) {
+    int total = amount * price;
+    return total.toString().toVND();
+  }
+}
