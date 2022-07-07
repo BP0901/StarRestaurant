@@ -287,6 +287,7 @@ class BanAnDAO {
           total += check['amount'] * check['price'];
           FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
             "idBill": bill.id,
+            "foodName": check["name"],
             "idFood": check['idFood'],
             "amount": check['amount'],
             "price": check['price']
