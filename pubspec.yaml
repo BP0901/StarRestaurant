@@ -42,7 +42,8 @@ dependencies:
   flutter_format_money_vietnam: ^0.0.2
   font_awesome_flutter: ^10.1.0
   flutter_speed_dial: ^6.0.0
-
+  pdf: ^3.8.1
+  printing: ^5.9.1
 
 dev_dependencies:
   flutter_test:
