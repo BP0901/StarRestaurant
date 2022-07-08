@@ -37,7 +37,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
             _headerPage(_idT),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
-                    .collection("MonAnDaXacNhan/$_idT/DaXacNhan")
+                    .collection("MonAnDaXacNhan")
+                    .where("idTable", isEqualTo: _idT)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -268,7 +269,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
         ),
         StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
-                .collection("MonAnDaXacNhan/$idT/DaXacNhan")
+                .collection("MonAnDaXacNhan")
+                .where("idTable", isEqualTo: idT)
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {

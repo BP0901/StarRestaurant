@@ -20,21 +20,23 @@ class BanAnDAO {
     }
   }
 
+  //Xác nhận đặt món
   void confirmOrders(
       String idT, Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
-        .collection("MonAnTamGoi/$idT/MonAnChoXacNhan")
+        .collection("MonAnTamGoi")
+        .where("idTable", isEqualTo: idT)
         .get()
         .then((value) {
       if (value.size != 0) {
         value.docs.forEach((element) {
           print(element.data());
           FirebaseFirestore.instance
-              .collection("MonAnDaXacNhan/$idT/DaXacNhan")
+              .collection("MonAnDaXacNhan")
               .doc()
               .set(element.data());
           FirebaseFirestore.instance
-              .collection("MonAnTamGoi/$idT/MonAnChoXacNhan")
+              .collection("MonAnTamGoi")
               .doc(element.id)
               .delete();
         });
@@ -45,6 +47,7 @@ class BanAnDAO {
     });
   }
 
+  // Thêm món ăn khi gọi món
   void addConfirmFood(String idTable, DocumentSnapshot? food, int amount,
       String note, Function onSuccess, Function(String) onfailure) {
     int price =
@@ -52,10 +55,9 @@ class BanAnDAO {
     Timestamp orderTime = Timestamp.fromDate(DateTime.now());
     FirebaseFirestore.instance
         .collection('MonAnTamGoi')
-        .doc(idTable)
-        .collection("MonAnChoXacNhan")
         .doc()
         .set({
+          "idTable": idTable,
           "orderTime": orderTime,
           "amount": amount,
           "idFood": food.get('id'),
@@ -71,17 +73,14 @@ class BanAnDAO {
         });
   }
 
+  // Thêm món ăn khi gọi món vào bàn chưa có người
   void addConfirmFoodtoNewTable(String idTable, DocumentSnapshot? food,
       int amount, String note, Function onSuccess, Function(String) onfailure) {
     int price =
         food!.get('discount') == 0 ? food.get('price') : food.get('discount');
     Timestamp orderTime = Timestamp.fromDate(DateTime.now());
-    FirebaseFirestore.instance
-        .collection('MonAnTamGoi')
-        .doc(idTable)
-        .collection("MonAnChoXacNhan")
-        .doc()
-        .set({
+    FirebaseFirestore.instance.collection('MonAnTamGoi').doc().set({
+      "idTable": idTable,
       "orderTime": orderTime,
       "amount": amount,
       "idFood": food.get('id'),
@@ -102,20 +101,18 @@ class BanAnDAO {
       Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
         .collection('MonAnTamGoi')
-        .doc(idTable)
-        .collection("MonAnChoXacNhan")
         .doc(foodConfirm!.id)
         .delete()
         .then((value) {
       FirebaseFirestore.instance
           .collection('MonAnTamGoi')
-          .doc(idTable)
-          .collection("MonAnChoXacNhan")
+          .where("idTable", isEqualTo: idTable)
           .get()
           .then((confirmFood) {
         if (confirmFood.size == 0) {
           FirebaseFirestore.instance
-              .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+              .collection("MonAnDaXacNhan")
+              .where("idTable", isEqualTo: idTable)
               .get()
               .then((confirmedFood) {
             if (confirmedFood.size == 0) {
@@ -139,8 +136,6 @@ class BanAnDAO {
       Function(String) onfailure) {
     FirebaseFirestore.instance
         .collection('MonAnTamGoi')
-        .doc(idTable)
-        .collection("MonAnChoXacNhan")
         .doc(foodConfirm!.id)
         .update({"amount": amount})
         .then((value) => onSuccess())
@@ -152,20 +147,20 @@ class BanAnDAO {
   void deleteOrderedFoodinTable(QueryDocumentSnapshot? foodOrdered, idTable,
       Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
-        .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+        .collection("MonAnDaXacNhan")
         .doc(foodOrdered!.id)
         .delete()
         .then((value) {
       FirebaseFirestore.instance
-          .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+          .collection("MonAnDaXacNhan")
+          .where("idTable", isEqualTo: idTable)
           .get()
           .then(
         (foodOrderedData) {
           if (foodOrderedData.size == 0) {
             FirebaseFirestore.instance
                 .collection('MonAnTamGoi')
-                .doc(idTable)
-                .collection("MonAnChoXacNhan")
+                .where("idTable", isEqualTo: idTable)
                 .get()
                 .then((foodConfirm) {
               if (foodConfirm.size == 0) {
@@ -189,7 +184,7 @@ class BanAnDAO {
       Function onSuccess,
       Function(String) onfailure) {
     FirebaseFirestore.instance
-        .collection("MonAnDaXacNhan/$idTable/DaXacNhan")
+        .collection("MonAnDaXacNhan")
         .doc(foodOrdered!.id)
         .update({"amount": amount})
         .then((value) => onSuccess())
@@ -202,19 +197,16 @@ class BanAnDAO {
       Function(String) onfailure) {
     // Duyệt món ăn từ bàn hiện tại
     FirebaseFirestore.instance
-        .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
+        .collection("MonAnDaXacNhan")
+        .where("idTable", isEqualTo: fromTableId)
         .get()
         .then((value) {
       value.docs.forEach((orderedFood) {
-        // Thêm món ăn vào bàn mới
+        // Thây đổi id bàn ăn
         FirebaseFirestore.instance
-            .collection("MonAnDaXacNhan/$toTableId/DaXacNhan")
-            .add(orderedFood.data());
-        // Xóa món ăn bàn hiện tại
-        FirebaseFirestore.instance
-            .collection("MonAnDaXacNhan/$fromTableId/DaXacNhan")
+            .collection("MonAnDaXacNhan")
             .doc(orderedFood.id)
-            .delete();
+            .update({"idTable": toTableId});
       });
     }).whenComplete(() {
       // Cập nhật user phục vụ bàn ăn
@@ -241,7 +233,8 @@ class BanAnDAO {
       // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
       List<Map<String, dynamic>> list = [];
       FirebaseFirestore.instance
-          .collection("MonAnDaXacNhan/$idT/DaXacNhan")
+          .collection("MonAnDaXacNhan")
+          .where("idTable", isEqualTo: idT)
           .get()
           .then((orderedFood) {
         orderedFood.docs.forEach((food) {
