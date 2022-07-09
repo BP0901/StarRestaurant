@@ -292,8 +292,19 @@ class BanAnDAO {
             .update({"total": total});
       });
     }).whenComplete(() {
-      // Chuyển trạng thái bàn thành đang thanh toán
+      // Xóa các món ăn trong danh sách tạm gọi
+      FirebaseFirestore.instance
+          .collection('MonAnTamGoi')
+          .where("idTable", isEqualTo: idT)
+          .get()
+          .then((foodConfirm) {
+        foodConfirm.docs.forEach((food) => FirebaseFirestore.instance
+            .collection('MonAnTamGoi')
+            .doc(food.id)
+            .delete());
+      });
 
+      // Chuyển trạng thái bàn thành đang thanh toán
       _ref.doc(idT).update({"isPaying": true});
       onSuccess();
     }).catchError((onError) {
