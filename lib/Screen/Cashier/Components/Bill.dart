@@ -72,165 +72,144 @@ class _BillPrintState extends State<BillPrint> {
         DateFormat('dd-MM-yyyy – kk:mm').format(requestedPayTime);
 
     doc.addPage(
-      pw.Page(
-        pageTheme: pw.PageTheme(
-          pageFormat: format.copyWith(
-            marginBottom: 0,
-            marginLeft: 0,
-            marginRight: 0,
-            marginTop: 0,
+      pw.MultiPage(
+          pageTheme: pw.PageTheme(
+            pageFormat: format.copyWith(
+              marginBottom: 0,
+              marginLeft: 0,
+              marginRight: 0,
+              marginTop: 0,
+            ),
+            orientation: pw.PageOrientation.portrait,
+            theme: pw.ThemeData.withFont(
+              base: font1,
+              bold: font2,
+            ),
           ),
-          orientation: pw.PageOrientation.portrait,
-          theme: pw.ThemeData.withFont(
-            base: font1,
-            bold: font2,
-          ),
-        ),
-        build: (context) {
-          return pw.Center(
-              child: pw.Column(
-            mainAxisAlignment: pw.MainAxisAlignment.center,
-            children: [
-              pw.Flexible(
-                child: pw.Image(image, height: 100),
-              ),
-              pw.SizedBox(
-                height: 20,
-              ),
-              pw.Center(
-                child: pw.Text(
-                  'Star Restaurant',
-                  style: const pw.TextStyle(
-                    fontSize: 30,
-                  ),
-                ),
-              ),
-              pw.SizedBox(
-                height: 20,
-              ),
-              pw.Divider(),
-              pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      widget.tableName.toString(),
-                      style: const pw.TextStyle(
-                        fontSize: 50,
-                      ),
-                    ),
-                    pw.Text(
-                      formattedDate,
-                      style: const pw.TextStyle(
-                        fontSize: 25,
-                      ),
-                    ),
-                  ]),
-              pw.SizedBox(
-                height: 20,
-              ),
-              pw.Divider(),
-              pw.SizedBox(
-                width: 1000,
-                child: pw.ListView.builder(
-                  itemCount: widget.billDetail.data!.size,
-                  itemBuilder: (context, index) {
-                    String name =
-                        widget.billDetail.data!.docs[index].get("foodName");
-
-                    int amount =
-                        widget.billDetail.data!.docs[index].get("amount");
-                    int price =
-                        widget.billDetail.data!.docs[index].get("price");
-                    int total =
-                        widget.billDetail.data!.docs[index].get("amount") *
-                            widget.billDetail.data!.docs[index].get("price");
-                    return pw.Row(
+          build: (context) => <pw.Widget>[
+                pw.Header(
+                  child: pw.Center(
+                    child: pw.Column(
                       children: [
+                        pw.Image(image, height: 100),
                         pw.SizedBox(
-                          height: 30,
+                          height: 20,
                         ),
-                        pw.Column(children: [
-                          pw.Row(
-                            mainAxisAlignment:
-                                pw.MainAxisAlignment.spaceBetween,
-                            children: [
-                              pw.Text(
-                                name,
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                              pw.Text(""),
-                            ],
+                        pw.Center(
+                          child: pw.Text(
+                            'Star Restaurant',
+                            style: const pw.TextStyle(
+                              fontSize: 30,
+                            ),
                           ),
-                          pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.end,
-                            children: [
-                              pw.Text(
-                                amount.toString(),
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                              pw.Text(
-                                " X ",
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                              pw.Text(
-                                price.toString().toVND(),
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                              pw.Text(
-                                " = ",
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                              pw.Text(
-                                total.toString().toVND(),
-                                style: const pw.TextStyle(
-                                  fontSize: 30,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ]),
-                        pw.SizedBox(
-                          height: 30,
                         ),
                       ],
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-              pw.SizedBox(
-                height: 20,
-              ),
-              pw.Divider(),
-              pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text(
-                      "Tổng",
-                      style: const pw.TextStyle(
-                        fontSize: 50,
+                pw.SizedBox(
+                  height: 20,
+                ),
+                pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        widget.tableName.toString(),
+                        style: const pw.TextStyle(
+                          fontSize: 50,
+                        ),
                       ),
-                    ),
-                    pw.Text(
-                      widget.bill!.get("total").toString().toVND(),
-                      style: const pw.TextStyle(
-                        fontSize: 50,
+                      pw.Text(
+                        formattedDate,
+                        style: const pw.TextStyle(
+                          fontSize: 25,
+                        ),
                       ),
-                    ),
-                  ]),
-            ],
-          ));
-        },
-      ),
+                    ]),
+                pw.Divider(),
+                pw.ListView.builder(
+                    itemCount: widget.billDetail.data!.size,
+                    itemBuilder: (context, index) {
+                      int check = 0;
+                      String name =
+                          widget.billDetail.data!.docs[index].get("foodName");
+                      int amount =
+                          widget.billDetail.data!.docs[index].get("amount");
+                      int price =
+                          widget.billDetail.data!.docs[index].get("price");
+                      int total =
+                          widget.billDetail.data!.docs[index].get("amount") *
+                              widget.billDetail.data!.docs[index].get("price");
+                      return pw.Padding(
+                          padding: const pw.EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          child: pw.Column(
+                              crossAxisAlignment: pw.CrossAxisAlignment.start,
+                              children: [
+                                pw.Text(
+                                  name,
+                                  style: const pw.TextStyle(
+                                    fontSize: 30,
+                                  ),
+                                ),
+                                pw.Row(
+                                  mainAxisAlignment:
+                                      pw.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pw.Text(
+                                      amount.toString(),
+                                      style: const pw.TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                    pw.Text(
+                                      " X ",
+                                      style: const pw.TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                    pw.Text(
+                                      price.toString().toVND(),
+                                      style: const pw.TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                    pw.Text(
+                                      " = ",
+                                      style: const pw.TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                    pw.Text(
+                                      total.toString().toVND(),
+                                      style: const pw.TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ]));
+                    }),
+                pw.SizedBox(
+                  height: 20,
+                ),
+                pw.Divider(),
+                pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        "Tổng(+VAT):",
+                        style: const pw.TextStyle(
+                          fontSize: 40,
+                        ),
+                      ),
+                      pw.Text(
+                        widget.bill!.get("total").toString().toVND(),
+                        style: const pw.TextStyle(
+                          fontSize: 50,
+                        ),
+                      ),
+                    ]),
+              ]),
     );
 
     return doc.save();
