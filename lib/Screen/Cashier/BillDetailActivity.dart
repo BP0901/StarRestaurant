@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:star_restaurant/Components/flash_message.dart';
+import 'package:star_restaurant/Controller/CashierController.dart';
 import 'package:star_restaurant/Screen/Cashier/Components/Bill.dart';
 import 'package:star_restaurant/Util/Constants.dart';
 
@@ -18,6 +20,7 @@ class BillDetailActivity extends StatefulWidget {
 }
 
 class _BillDetailActivityState extends State<BillDetailActivity> {
+  CashierController _cashierController = CashierController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +68,73 @@ class _BillDetailActivityState extends State<BillDetailActivity> {
                                 textScaleFactor: 2,
                                 style: TextStyle(color: kPrimaryColor),
                               ),
-                              onPressed: () {},
+                              onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                          backgroundColor: kSupColor,
+                                          content: const Text(
+                                            'Xác nhận đã thanh toán',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, 'Hủy'),
+                                              child: const Text(
+                                                'Hủy',
+                                                style: TextStyle(
+                                                    color: kPrimaryColor),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                _cashierController
+                                                    .confirmPayTheBill(
+                                                        widget.bill, () {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: FlashMessageScreen(
+                                                          type: "Thông báo",
+                                                          content:
+                                                              "Xác nhận thành công!",
+                                                          color: Colors.green),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      elevation: 0,
+                                                    ),
+                                                  );
+                                                  Navigator.pop(context);
+                                                }, (msg) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content:
+                                                          FlashMessageScreen(
+                                                              type: "Thông báo",
+                                                              content: msg,
+                                                              color:
+                                                                  kPrimaryColor),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      elevation: 0,
+                                                    ),
+                                                  );
+                                                  Navigator.pop(context);
+                                                });
+                                              },
+                                              child: const Text(
+                                                'Có',
+                                                style: TextStyle(
+                                                    color: kPrimaryColor),
+                                              ),
+                                            ),
+                                          ])),
                             ),
                             IconButton(
                                 onPressed: () => Get.to(BillPrint(

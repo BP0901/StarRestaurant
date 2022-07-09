@@ -129,9 +129,9 @@ class _BillPrintState extends State<BillPrint> {
                 height: 20,
               ),
               pw.Divider(),
-              pw.Expanded(
+              pw.SizedBox(
+                width: 1000,
                 child: pw.ListView.builder(
-                  
                   itemCount: widget.billDetail.data!.size,
                   itemBuilder: (context, index) {
                     String name =
@@ -151,7 +151,8 @@ class _BillPrintState extends State<BillPrint> {
                         ),
                         pw.Column(children: [
                           pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.start,
+                            mainAxisAlignment:
+                                pw.MainAxisAlignment.spaceBetween,
                             children: [
                               pw.Text(
                                 name,
@@ -159,6 +160,7 @@ class _BillPrintState extends State<BillPrint> {
                                   fontSize: 30,
                                 ),
                               ),
+                              pw.Text(""),
                             ],
                           ),
                           pw.Row(
