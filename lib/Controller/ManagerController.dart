@@ -46,4 +46,12 @@ class ManagerController {
       banAnDAO.createTable(name, type, onSuccess, onfailure);
     } catch (e) {}
   }
+  void updateStaff(String id, String name,
+      int gender,
+      DateTime birth,
+      String role,
+      Function onSuccess,
+      Function(String) onfailure){
+    nhanVienDAO.updateStaff(id, name, gender, birth, role, onSuccess, (p0) => null);
+  }
 }
