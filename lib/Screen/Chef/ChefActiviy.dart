@@ -56,8 +56,8 @@ class _ChefActivity extends State<ChefActivity> {
                 label: "Món mới",
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.check_circle),
-                label: "Món đã xong",
+                icon: Icon(Icons.cookie),
+                label: "Món đang nấu",
               ),
             ]),
       ),

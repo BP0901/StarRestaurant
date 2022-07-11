@@ -8,8 +8,9 @@ import '../../../Controller/ManagerController.dart';
 import '../../../Util/Constants.dart';
 import '../StaffScreen/AddStaffActivity.dart';
 
-Widget buildStaffItem(BuildContext context, int index, DocumentSnapshot? document ,String? value) {
-  ManagerController controller= ManagerController();
+Widget buildStaffItem(BuildContext context, int index,
+    DocumentSnapshot? document, String? value) {
+  ManagerController controller = ManagerController();
   String _role = document?.get('role');
   String _name = document?.get('name');
   bool _locker = document?.get('disable');
@@ -19,18 +20,19 @@ Widget buildStaffItem(BuildContext context, int index, DocumentSnapshot? documen
   DateTime _birth = _date.toDate();
   String _username = document?.get('username');
   // document.get('name').toString().toLowerCase().contains(value!)
-  if(value==null){
+  if (value == null) {
     if (document != null) {
       return GestureDetector(
         onLongPress: () {
           _deleteStaff(context, _name, document.id);
         },
-        onTap: ()  {
-          _infoStaff( context, document.id, _name, _role, _gender, _locker, formatBirth.format(_birth),_username,document);
+        onTap: () {
+          _infoStaff(context, document.id, _name, _role, _gender, _locker,
+              formatBirth.format(_birth), _username, document);
         },
         child: Card(
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             color: (index) % 2 == 0 ? kSecondaryColor : kSupColor,
             elevation: 10,
             //this lesson will customize this ListItem, using Column and Row
@@ -75,57 +77,59 @@ Widget buildStaffItem(BuildContext context, int index, DocumentSnapshot? documen
                 ),
                 Expanded(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Locker',
-                              style: TextStyle(fontSize: 18, color: Colors.white)),
-                        ),
-                        Icon(
-                          Icons.lock_open,
-                          color: kSuccessColor,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 10),
-                        )
-                      ],
-                    ))
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text('Locker',
+                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                    ),
+                    Icon(
+                      Icons.lock_open,
+                      color: kSuccessColor,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 10),
+                    )
+                  ],
+                ))
               ],
             )),
       );
     } else {
       return const SizedBox.shrink();
     }
-  }else{
-    if (document != null&& document.get('name').toString().toLowerCase().contains(value!)) {
+  } else {
+    if (document != null &&
+        document.get('name').toString().toLowerCase().contains(value)) {
       return GestureDetector(
         onLongPress: () {
           _deleteStaff(context, _name, document.id);
         },
-        onTap: ()  {
-          _infoStaff( context, document.id, _name, _role, _gender, _locker, formatBirth.format(_birth),_username,document);
+        onTap: () {
+          _infoStaff(context, document.id, _name, _role, _gender, _locker,
+              formatBirth.format(_birth), _username, document);
         },
         child: Card(
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             color: (index) % 2 == 0 ? kSecondaryColor : kSupColor,
             elevation: 10,
             //this lesson will customize this ListItem, using Column and Row
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(10),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(padding: EdgeInsets.only(top: 10)),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Nhân viên: ',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -143,32 +147,35 @@ Widget buildStaffItem(BuildContext context, int index, DocumentSnapshot? documen
                     ),
                     // ${(document.get('gender')) == '1' ? 'Nam' : 'Nữ'}
                     Text('Gender: ${_gender == 0 ? 'Nam' : 'Nữ'}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Birth: ${formatBirth.format(_birth)}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Role: ${_role}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    Padding(padding: EdgeInsets.only(bottom: 10)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
+                    const Padding(padding: EdgeInsets.only(bottom: 10)),
                   ],
                 ),
                 Expanded(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Text('Locker',
-                              style: TextStyle(fontSize: 18, color: Colors.white)),
-                        ),
-                        Icon(
-                          Icons.lock_open,
-                          color: kSuccessColor,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 10),
-                        )
-                      ],
-                    ))
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(10.0),
+                      child: const Text('Locker',
+                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                    ),
+                    const Icon(
+                      Icons.lock_open,
+                      color: kSuccessColor,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 10),
+                    )
+                  ],
+                ))
               ],
             )),
       );
@@ -176,17 +183,24 @@ Widget buildStaffItem(BuildContext context, int index, DocumentSnapshot? documen
       return const SizedBox.shrink();
     }
   }
-
 }
 
-void _infoStaff(BuildContext context, String id, String name, String role, int gender, bool locker, String birth,String username, DocumentSnapshot document){
+void _infoStaff(
+    BuildContext context,
+    String id,
+    String name,
+    String role,
+    int gender,
+    bool locker,
+    String birth,
+    String username,
+    DocumentSnapshot document) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-              borderRadius:
-              BorderRadius.circular(20.0)), //this right here
+              borderRadius: BorderRadius.circular(20.0)), //this right here
           child: Container(
             height: 250,
             child: Padding(
@@ -335,22 +349,22 @@ void _infoStaff(BuildContext context, String id, String name, String role, int g
       });
 }
 
-void _deleteStaff(BuildContext context, String name,String id){
+void _deleteStaff(BuildContext context, String name, String id) {
   ManagerController controller = ManagerController();
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có muốn xóa ${name}'),
-        actions: <Widget>[
-          FlatButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text('Cancel')),
-          FlatButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'))
-        ],
-      )).then((value) {
+            title: const Text('Xác nhận xóa'),
+            content: Text('Bạn có muốn xóa ${name}'),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel')),
+              FlatButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'))
+            ],
+          )).then((value) {
     if (value != null) {
       if (value == 'OK') {
         controller.deleteStaff(id, () {
@@ -369,9 +383,7 @@ void _deleteStaff(BuildContext context, String name,String id){
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: FlashMessageScreen(
-                  type: "Thông báo",
-                  content: msg,
-                  color: kPrimaryColor),
+                  type: "Thông báo", content: msg, color: kPrimaryColor),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.transparent,
               elevation: 0,
