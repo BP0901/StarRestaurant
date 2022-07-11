@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import '../../../Components/flash_message.dart';
+import '../../../Controller/ManagerController.dart';
 import '../../../Util/Constants.dart';
 import '../components/DrawerMGTM.dart';
 import '../components/Find.dart';
-import './StaffListView.dart';
 import 'AddStaffActivity.dart';
+import '../components/CardStaff.dart';
 
 class StaffPage extends StatefulWidget {
   StaffPage({Key? key}) : super(key: key);
@@ -13,7 +17,9 @@ class StaffPage extends StatefulWidget {
 }
 
 class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
+  final TextEditingController _findController = TextEditingController();
   bool _isFinding = false;
+  ManagerController controller = ManagerController();
   String _findingValue = "";
   final TextEditingController _findStaffController = TextEditingController();
   Stream<QuerySnapshot> _staffCateStream =
@@ -38,8 +44,9 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
             icon: Icon(Icons.add),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      AddStaff() //you can send parameters using constructor
+                  builder: (context) => AddStaff(
+                        staff: null,
+                      ) //you can send parameters using constructor
                   ));
               // showSearch(context: context, delegate: Seach());
             },
@@ -54,7 +61,7 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
           child: Column(
             children: [
               _findStaff(),
-              _isFinding ? _findStaffByName() : StaffList(),
+              _isFinding ? _findStaffByName() : _staffList(),
             ],
           ),
         ),
@@ -63,10 +70,12 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
   }
 
   Widget _findStaff() {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
       child: TextField(
         style: TextStyle(color: Colors.white),
+        controller: _findController,
+        onChanged:(String value) => onchangeFindVlaue(value),
         decoration: InputDecoration(
             focusColor: kPrimaryColor,
             prefixIcon: Icon(
@@ -86,7 +95,7 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
     );
   }
 
-  void onchangeFindVlaue(String value) async {
+  onchangeFindVlaue(String value) async {
     if (value.isEmpty) {
       setState(() {
         _isFinding = false;
@@ -116,36 +125,35 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
               return ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: snapshot.data?.docs.length,
-                itemBuilder: (context, index) => _buildVerticalStaffByCateItem(
-                    index, snapshot.data?.docs[index]),
+                itemBuilder: (context, index) =>
+                    buildStaffItem(context, index, snapshot.data?.docs[index],_findingValue),
               );
             }
           }),
     );
   }
 
-  Widget _buildVerticalStaffByCateItem(int index, DocumentSnapshot? document) {
-    if (document != null &&
-        document.get('name').toString().toLowerCase().contains(_findingValue)) {
-      return Padding(
-        padding: const EdgeInsets.all(kDefaultPadding),
-        child: Container(
-          decoration: BoxDecoration(
-              color: kSecondaryColor, borderRadius: BorderRadius.circular(15)),
-          child: Padding(
-              padding: const EdgeInsets.all(kDefaultPadding),
-              child: Column(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(color: kSecondaryColor),
-                    child: Column(),
-                  ),
-                ],
-              )),
-        ),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
+  Widget _staffList() {
+    return Expanded(
+      child: StreamBuilder<QuerySnapshot>(
+          stream: _staffCateStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) =>
+                    buildStaffItem(context, index, snapshot.data?.docs[index],null),
+              );
+            }
+          }),
+    );
   }
 }
