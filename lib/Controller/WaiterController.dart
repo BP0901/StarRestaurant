@@ -99,6 +99,6 @@ class WaiterController {
     listCheckedBanAn.forEach((element) {
       listTableToSave.addAll({element.name: element.id});
     });
-    banAnDAO.mergeTables(listTableToSave, onSuccess, onfailure);
+    // banAnDAO.mergeTables(listTableToSave, onSuccess, onfailure);
   }
 }
