@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/WaiterController.dart';
+import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 import 'package:star_restaurant/Screen/Waiter/Components/MenuButtonInTable.dart';
 import 'package:intl/intl.dart';
 
@@ -18,11 +19,12 @@ class FoodOrdered extends StatefulWidget {
 
 class _FoodOrderedState extends State<FoodOrdered> {
   DocumentSnapshot? _tableFood;
+  List<dynamic> _listTable = [];
 
   @override
   void initState() {
-    super.initState();
     _tableFood = widget.tableFood;
+    super.initState();
   }
 
   @override
@@ -90,66 +92,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                             ),
                           ),
                         ],
-                        rows: List<DataRow>.generate(
-                            snapshot.data!.size,
-                            (index) => DataRow(
-                                    onLongPress: () => _changeOrDelFood(context,
-                                        snapshot, index, waiterController),
-                                    cells: <DataCell>[
-                                      DataCell(
-                                        Text(
-                                          snapshot.data!.docs[index]
-                                              .get('name'),
-                                          style: TextStyle(
-                                              color: snapshot.data!.docs[index]
-                                                          .get('status') ==
-                                                      "new"
-                                                  ? Colors.white
-                                                  : snapshot.data!.docs[index]
-                                                              .get('status') ==
-                                                          "cooking"
-                                                      ? kPrimaryColor
-                                                      : snapshot.data!
-                                                                  .docs[index]
-                                                                  .get(
-                                                                      'status') ==
-                                                              "done"
-                                                          ? Colors.green
-                                                          : Colors.blue),
-                                        ),
-                                        onTap: () => _showFoodDetail(
-                                            context, snapshot, index),
-                                        onLongPress: () => _changeOrDelFood(
-                                            context,
-                                            snapshot,
-                                            index,
-                                            waiterController),
-                                      ),
-                                      DataCell(Text(
-                                        snapshot.data!.docs[index]
-                                            .get('amount')
-                                            .toString(),
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      )),
-                                      DataCell(Text(
-                                        snapshot.data!.docs[index]
-                                            .get('price')
-                                            .toString()
-                                            .toVND(),
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      )),
-                                      DataCell(Text(
-                                        _getTotal(
-                                            snapshot.data!.docs[index]
-                                                .get('amount'),
-                                            snapshot.data!.docs[index]
-                                                .get('price')),
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      )),
-                                    ])),
+                        rows: _dataTable(context, waiterController, snapshot),
                       ),
                     );
                   }
@@ -162,9 +105,9 @@ class _FoodOrderedState extends State<FoodOrdered> {
     );
   }
 
-  Future<dynamic> _showFoodDetail(BuildContext context,
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot, int index) {
-    DateTime orderTime = snapshot.data!.docs[index].get('orderTime').toDate();
+  Future<dynamic> _showFoodDetail(
+      BuildContext context, MonAnDaGoi monAn, int index) {
+    DateTime orderTime = monAn.orderTime.toDate();
     String formattedDate = DateFormat('dd-MM-yyyy – kk:mm').format(orderTime);
     return showDialog(
         context: context,
@@ -173,7 +116,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
               backgroundColor: kSupColor,
               title: Center(
                 child: Text(
-                  snapshot.data!.docs[index].get('name'),
+                  monAn.name,
                   style: const TextStyle(color: kPrimaryColor),
                 ),
               ),
@@ -187,7 +130,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        snapshot.data!.docs[index].get('amount').toString(),
+                        monAn.amount.toString(),
                         style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],
@@ -199,7 +142,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        snapshot.data!.docs[index].get('price').toString(),
+                        monAn.price.toString().toVND(),
                         style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],
@@ -223,7 +166,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
-                        snapshot.data!.docs[index].get('status'),
+                        monAn.status,
                         style: const TextStyle(color: kPrimaryColor),
                       ),
                     ],
@@ -240,7 +183,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                     child: Row(
                       children: [
                         Text(
-                          snapshot.data!.docs[index].get('note'),
+                          monAn.note,
                           style: const TextStyle(color: kPrimaryColor),
                         ),
                       ],
@@ -373,11 +316,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
     return total.toString().toVND();
   }
 
-  Future<dynamic> _changeOrDelFood(
-      BuildContext context,
-      AsyncSnapshot<QuerySnapshot>? snapshot,
-      int index,
-      WaiterController waiterController) {
+  Future<dynamic> _changeOrDelFood(BuildContext context, MonAnDaGoi monAn,
+      int index, WaiterController waiterController) {
     return showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -385,7 +325,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
               backgroundColor: kSupColor,
               title: Center(
                 child: Text(
-                  snapshot!.data!.docs[index].get('name'),
+                  monAn.name,
                   style: const TextStyle(color: kPrimaryColor),
                 ),
               ),
@@ -396,11 +336,10 @@ class _FoodOrderedState extends State<FoodOrdered> {
                     ElevatedButton(
                         style: ElevatedButton.styleFrom(primary: kPrimaryColor),
                         onPressed: () {
-                          int _amount =
-                              snapshot.data!.docs[index].get('amount');
+                          int _amount = monAn.amount;
                           Navigator.pop(context);
-                          _updateFoodAmount(context, snapshot, index, _amount,
-                              waiterController);
+                          _updateFoodAmount(
+                              context, monAn, index, _amount, waiterController);
                         },
                         child: const Text("Thây đổi số lượng")),
                     ElevatedButton(
@@ -408,7 +347,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                         onPressed: () {
                           Navigator.pop(context);
                           _delOrderedFood(
-                              context, waiterController, snapshot, index);
+                              context, waiterController, monAn, index);
                         },
                         child: const Text("Xóa món ăn"))
                   ],
@@ -417,11 +356,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
             ));
   }
 
-  Future<dynamic> _delOrderedFood(
-      BuildContext context,
-      WaiterController waiterController,
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
-      int index) {
+  Future<dynamic> _delOrderedFood(BuildContext context,
+      WaiterController waiterController, MonAnDaGoi monAn, int index) {
     return showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -438,8 +374,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                 TextButton(
                     onPressed: () {
                       waiterController.deleteOrderedFoodinTable(
-                          snapshot.data!.docs[index],
-                          widget.tableFood!.get('id'), () {
+                          monAn, widget.tableFood!.get('id'), () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -475,12 +410,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
             ));
   }
 
-  Future<dynamic> _updateFoodAmount(
-      BuildContext context,
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot,
-      int index,
-      int _amount,
-      WaiterController waiterController) {
+  Future<dynamic> _updateFoodAmount(BuildContext context, MonAnDaGoi monAn,
+      int index, int _amount, WaiterController waiterController) {
     return showModalBottomSheet(
         elevation: 10,
         backgroundColor: kSupColor,
@@ -504,7 +435,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            snapshot.data!.docs[index].get('name'),
+                            monAn.name,
                             textScaleFactor: 1.5,
                             style: const TextStyle(
                                 color: kPrimaryColor,
@@ -558,9 +489,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                             ),
                             onPressed: () {
                               waiterController.updateOrderedFoodAmount(
-                                  snapshot.data!.docs[index],
-                                  widget.tableFood!.id,
-                                  _amount, () {
+                                  monAn, widget.tableFood!.id, _amount, () {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -601,5 +530,45 @@ class _FoodOrderedState extends State<FoodOrdered> {
                 ),
               ),
             ));
+  }
+
+  _dataTable(BuildContext context, WaiterController waiterController,
+      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
+    return List<DataRow>.generate(snapshot.data!.size, (index) {
+      MonAnDaGoi monAn = MonAnDaGoi.fromDocument(snapshot.data!.docs[index]);
+      return DataRow(
+          onLongPress: () =>
+              _changeOrDelFood(context, monAn, index, waiterController),
+          cells: <DataCell>[
+            DataCell(
+              Text(
+                monAn.name,
+                style: TextStyle(
+                    color: monAn.status == "new"
+                        ? Colors.white
+                        : monAn.status == "cooking"
+                            ? kPrimaryColor
+                            : monAn.status == "done"
+                                ? Colors.green
+                                : Colors.blue),
+              ),
+              onTap: () => _showFoodDetail(context, monAn, index),
+              onLongPress: () =>
+                  _changeOrDelFood(context, monAn, index, waiterController),
+            ),
+            DataCell(Text(
+              monAn.amount.toString(),
+              style: const TextStyle(color: Colors.white),
+            )),
+            DataCell(Text(
+              monAn.price.toString().toVND(),
+              style: const TextStyle(color: Colors.white),
+            )),
+            DataCell(Text(
+              _getTotal(monAn.amount, monAn.price),
+              style: const TextStyle(color: Colors.white),
+            )),
+          ]);
+    });
   }
 }

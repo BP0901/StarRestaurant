@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class BanAnDAO {
   final User? _user = FirebaseAuth.instance.currentUser;
@@ -97,6 +98,7 @@ class BanAnDAO {
     });
   }
 
+  // Xóa món ăn tạm gọi
   void deleteConfirmFoodinTable(DocumentSnapshot? foodConfirm, String idTable,
       Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
@@ -128,6 +130,7 @@ class BanAnDAO {
     });
   }
 
+  //Cập nhật số lượng món ăn tạm gọi
   void updateAmountConfirmFoodinTable(
       QueryDocumentSnapshot? foodConfirm,
       String idTable,
@@ -144,11 +147,12 @@ class BanAnDAO {
         });
   }
 
-  void deleteOrderedFoodinTable(QueryDocumentSnapshot? foodOrdered, idTable,
+  // Xóa món ăn đã gọi
+  void deleteOrderedFoodinTable(MonAnDaGoi foodOrdered, idTable,
       Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
         .collection("MonAnDaXacNhan")
-        .doc(foodOrdered!.id)
+        .doc(foodOrdered.id)
         .delete()
         .then((value) {
       FirebaseFirestore.instance
@@ -177,15 +181,12 @@ class BanAnDAO {
     });
   }
 
-  void updateOrderedFoodinTable(
-      QueryDocumentSnapshot? foodOrdered,
-      String idTable,
-      int amount,
-      Function onSuccess,
-      Function(String) onfailure) {
+  // Cập nhật cố lượng món ăn đã gọi
+  void updateOrderedFoodinTable(MonAnDaGoi monAn, String idTable, int amount,
+      Function onSuccess, Function(String) onfailure) {
     FirebaseFirestore.instance
         .collection("MonAnDaXacNhan")
-        .doc(foodOrdered!.id)
+        .doc(monAn.id)
         .update({"amount": amount})
         .then((value) => onSuccess())
         .catchError((onError) {
@@ -193,6 +194,7 @@ class BanAnDAO {
         });
   }
 
+  // chuyển bàn ăn
   void changeTable(String fromTableId, String toTableId, Function onSuccess,
       Function(String) onfailure) {
     // Duyệt món ăn từ bàn hiện tại
@@ -219,6 +221,7 @@ class BanAnDAO {
     });
   }
 
+  // Yêu cầu thanh toán
   void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
     // Tạo hóa đơn mới
     Timestamp payTime = Timestamp.fromDate(DateTime.now());
@@ -312,4 +315,23 @@ class BanAnDAO {
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
     });
   }
+
+  // Ghép bàn ăn
+  // Future<void> mergeTables(Map<String, String> listTableToSave,
+  //     Function onSuccess, Function(String) onfailure) async {
+  //   listTableToSave.forEach((key, value) async {
+  //     await FirebaseFirestore.instance
+  //         .collection("BanDangGhep")
+  //         .get()
+  //         .then((value) => value.docs.forEach((element) {
+  //               if (element.data().containsValue(value)) {
+  //                 FirebaseFirestore.instance
+  //                     .collection("BanDangGhep")
+  //                     .doc(element.id)
+  //                     .delete();
+  //               }
+  //             }));
+  //   });
+  //   await FirebaseFirestore.instance.collection("BanDangGhep").doc().set({listTableToSave.});
+  // }
 }

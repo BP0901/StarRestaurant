@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:star_restaurant/DAO/BanAnDAO.dart';
+import 'package:star_restaurant/Model/BanAn.dart';
+import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class WaiterController {
   BanAnDAO banAnDAO = BanAnDAO();
@@ -42,39 +44,35 @@ class WaiterController {
         foodConfirm, tableId, amount, onSuccess, onfailure);
   }
 
-  void deleteOrderedFoodinTable(QueryDocumentSnapshot? foodOrdered, idTable,
+  void deleteOrderedFoodinTable(MonAnDaGoi foodOrdered, idTable,
       Function onSuccess, Function(String) onfailure) {
-    if (foodOrdered!.get('status') == "cooking") {
+    if (foodOrdered.status == "cooking") {
       onfailure("Món đang được làm. Không thể xóa!");
       return;
     }
-    if (foodOrdered.get('status') == "done") {
+    if (foodOrdered.status == "done") {
       onfailure("Món đã làm xong. Không thể xóa!");
       return;
     }
-    if (foodOrdered.get('status') == "new") {
+    if (foodOrdered.status == "new") {
       banAnDAO.deleteOrderedFoodinTable(
           foodOrdered, idTable, onSuccess, onfailure);
     }
   }
 
-  void updateOrderedFoodAmount(
-      QueryDocumentSnapshot? foodOrdered,
-      String idTable,
-      int amount,
-      Function onSuccess,
-      Function(String) onfailure) {
-    if (foodOrdered!.get('status') == "cooking") {
+  void updateOrderedFoodAmount(MonAnDaGoi monAn, String idTable, int amount,
+      Function onSuccess, Function(String) onfailure) {
+    if (monAn.status == "cooking") {
       onfailure("Món đang được làm. Không thể thây đổi!");
       return;
     }
-    if (foodOrdered.get('status') == "done") {
+    if (monAn.status == "done") {
       onfailure("Món đã làm xong. Không thây đổi!");
       return;
     }
-    if (foodOrdered.get('status') == "new") {
+    if (monAn.status == "new") {
       banAnDAO.updateOrderedFoodinTable(
-          foodOrdered, idTable, amount, onSuccess, onfailure);
+          monAn, idTable, amount, onSuccess, onfailure);
     }
   }
 
@@ -87,5 +85,20 @@ class WaiterController {
     banAnDAO.payTheBill(idT, onSuccess, onfailure);
   }
 
-  
+  void mergeTables(Map<int, Map<BanAn, bool>> listBanAn, Function onSuccess,
+      Function(String) onfailure) {
+    List<BanAn> listCheckedBanAn = [];
+    // Lọc các table true(đã chọn)
+    listBanAn.forEach((key, value) {
+      if (value.containsValue(true)) {
+        listCheckedBanAn.add(value.keys.first);
+      }
+    });
+    // MAp dữ liệu để lưu xuống firebase
+    Map<String, String> listTableToSave = Map<String, String>();
+    listCheckedBanAn.forEach((element) {
+      listTableToSave.addAll({element.name: element.id});
+    });
+    banAnDAO.mergeTables(listTableToSave, onSuccess, onfailure);
+  }
 }
