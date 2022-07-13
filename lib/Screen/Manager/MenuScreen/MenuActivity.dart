@@ -1,4 +1,8 @@
+
 import 'package:flutter/material.dart';
+import 'package:star_restaurant/Controller/ManagerController.dart';
+import 'package:star_restaurant/Screen/Manager/MenuScreen/EditMenuAxtivity.dart';
+import 'package:star_restaurant/Screen/Manager/components/CardFood.dart';
 import '../components/DrawerMGTM.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../Util/constants.dart';
@@ -9,153 +13,65 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPage extends State<MenuPage> {
+  final TextEditingController _findController = TextEditingController();
+  bool _isFinding = false;
+  ManagerController controller = ManagerController();
+  String _findingValue = "";
+  Stream<QuerySnapshot> _foodCateStream =
+  FirebaseFirestore.instance.collection('MonAn').snapshots();
+  int _cateIndex = -1;
+  chooseCategory(chooseIndex) {
+    _cateIndex = chooseIndex;
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-
+    //In this lesson, we need to add AppBar and more "Add" button
+    //This must be Scaffold!. not MaterialApp !
     return Scaffold(
+      drawer: DrawerMGTM(),
       appBar: AppBar(
         backgroundColor: kAppBarColor,
-        title: Text('Quản lý thực đơn'),
+        title: const Text('Quản lý thực đơn'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EditMenu(
+                    food: null,
+                  ) //you can send parameters using constructor
+              ));
+              // showSearch(context: context, delegate: Seach());
+            },
+          )
+        ],
       ),
-      drawer: DrawerMGTM(),
-      body: Container(
-        color: kSupColor,
-        padding: EdgeInsets.all(10),
-        child: Column(
-          //In this lesson, we will replace the input form with "Modal Bottom Sheet"
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+      key: _scaffoldKey,
+      body: SafeArea(
+          child: Material(
+            child: Container(
+              color: kSupColor,
+              child: Column(
+                children: [
+                  _findFood(),
+                  _isFinding ? _findFoodByName() : _foodList(),
+                ],
+              ),
             ),
-            findFood(),
-            buildListView()
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class buildListView extends StatelessWidget {
-  bool _isFinding = false;
-  String _findingValue = "";
-  final TextEditingController _findFoodController = TextEditingController();
-  Stream<QuerySnapshot> _foodCateStream =
-      FirebaseFirestore.instance.collection('MonAn').snapshots();
-  Widget _buildListView(int index, DocumentSnapshot? document) {
-    return GestureDetector(
-      onTap: () => {},
-      child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          color: (index) % 2 == 0 ? Colors.blueAccent : Colors.indigoAccent,
-          elevation: 10,
-          //this lesson will customize this ListItem, using Column and Row
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Image.network(
-                    document?.get('image'),
-                    height: 100,
-                    width: 100,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    Text(
-                      '${document?.get('name')}',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.red[400]),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Unit: ${document?.get('unit')}',
-                            style: TextStyle(fontSize: 18, color: Colors.white)),
-                        Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Text('Price: ${document?.get('price')}',
-                                      style: TextStyle(fontSize: 18, color: Colors.white)),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                          style: BorderStyle.solid),
-                                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(right: 10),
-                                )
-                              ],
-                            ))
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-            ],
           )),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Expanded(
-      child: StreamBuilder<QuerySnapshot>(
-          stream: _foodCateStream,
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
-                ),
-              );
-            } else {
-              return ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: snapshot.data?.docs.length,
-                itemBuilder: (context, index) =>
-                    _buildListView(index, snapshot.data?.docs[index]),
-              );
-              ;
-            }
-          }),
-    );
-  }
-}
-
-class findFood extends StatelessWidget {
-  const findFood({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(right: 10, bottom: 20),
+  Widget _findFood() {
+    return Padding(
+      padding: EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
       child: TextField(
         style: TextStyle(color: Colors.white),
-        decoration: InputDecoration(
+        controller: _findController,
+        onChanged:(String value) => onchangeFindVlaue(value),
+        decoration: const InputDecoration(
             focusColor: kPrimaryColor,
             prefixIcon: Icon(
               Icons.search,
@@ -173,4 +89,67 @@ class findFood extends StatelessWidget {
       ),
     );
   }
+
+  onchangeFindVlaue(String value) async {
+    if (value.isEmpty) {
+      setState(() {
+        _isFinding = false;
+        _findingValue = value.toLowerCase();
+      });
+    } else {
+      setState(() {
+        _isFinding = true;
+        _findingValue = value.toLowerCase();
+      });
+    }
+  }
+
+  Widget _findFoodByName() {
+    return Expanded(
+      child: StreamBuilder<QuerySnapshot>(
+          stream: _foodCateStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) =>
+                    buildFoodItem(context, index, snapshot.data?.docs[index],_findingValue),
+              );
+            }
+          }),
+    );
+  }
+
+  Widget _foodList() {
+    return Expanded(
+      child: StreamBuilder<QuerySnapshot>(
+          stream: _foodCateStream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                scrollDirection: Axis.vertical,
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) =>
+                    buildFoodItem(context, index, snapshot.data?.docs[index],null),
+              );
+            }
+          }),
+    );
+  }
 }
+
