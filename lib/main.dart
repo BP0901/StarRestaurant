@@ -10,6 +10,7 @@ void main() async {
   MessagingController.initialize();
   await Firebase.initializeApp();
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  _messaging.unsubscribeFromTopic("food");
   NotificationSettings settings = await _messaging.requestPermission(
     alert: true,
     announcement: false,
