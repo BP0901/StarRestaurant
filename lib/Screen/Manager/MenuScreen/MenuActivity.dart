@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:star_restaurant/Controller/ManagerController.dart';
 import 'package:star_restaurant/Screen/Manager/MenuScreen/EditMenuAxtivity.dart';
@@ -17,8 +16,8 @@ class _MenuPage extends State<MenuPage> {
   bool _isFinding = false;
   ManagerController controller = ManagerController();
   String _findingValue = "";
-  Stream<QuerySnapshot> _foodCateStream =
-  FirebaseFirestore.instance.collection('MonAn').snapshots();
+  final Stream<QuerySnapshot> _foodCateStream =
+      FirebaseFirestore.instance.collection('MonAn').snapshots();
   int _cateIndex = -1;
   chooseCategory(chooseIndex) {
     _cateIndex = chooseIndex;
@@ -40,9 +39,9 @@ class _MenuPage extends State<MenuPage> {
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => EditMenu(
-                    food: null,
-                  ) //you can send parameters using constructor
-              ));
+                        food: null,
+                      ) //you can send parameters using constructor
+                  ));
               // showSearch(context: context, delegate: Seach());
             },
           )
@@ -51,26 +50,26 @@ class _MenuPage extends State<MenuPage> {
       key: _scaffoldKey,
       body: SafeArea(
           child: Material(
-            child: Container(
-              color: kSupColor,
-              child: Column(
-                children: [
-                  _findFood(),
-                  _isFinding ? _findFoodByName() : _foodList(),
-                ],
-              ),
-            ),
-          )),
+        child: Container(
+          color: kSupColor,
+          child: Column(
+            children: [
+              _findFood(),
+              _isFinding ? _findFoodByName() : _foodList(),
+            ],
+          ),
+        ),
+      )),
     );
   }
 
   Widget _findFood() {
     return Padding(
-      padding: EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
+      padding: const EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
       child: TextField(
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         controller: _findController,
-        onChanged:(String value) => onchangeFindVlaue(value),
+        onChanged: (String value) => onchangeFindVlaue(value),
         decoration: const InputDecoration(
             focusColor: kPrimaryColor,
             prefixIcon: Icon(
@@ -120,8 +119,8 @@ class _MenuPage extends State<MenuPage> {
               return ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: snapshot.data?.docs.length,
-                itemBuilder: (context, index) =>
-                    buildFoodItem(context, index, snapshot.data?.docs[index],_findingValue),
+                itemBuilder: (context, index) => buildFoodItem(
+                    context, index, snapshot.data?.docs[index], _findingValue),
               );
             }
           }),
@@ -144,12 +143,11 @@ class _MenuPage extends State<MenuPage> {
               return ListView.builder(
                 scrollDirection: Axis.vertical,
                 itemCount: snapshot.data?.docs.length,
-                itemBuilder: (context, index) =>
-                    buildFoodItem(context, index, snapshot.data?.docs[index],null),
+                itemBuilder: (context, index) => buildFoodItem(
+                    context, index, snapshot.data?.docs[index], null),
               );
             }
           }),
     );
   }
 }
-

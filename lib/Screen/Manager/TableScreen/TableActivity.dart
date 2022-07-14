@@ -8,6 +8,8 @@ import '../../../Model/BanAn.dart';
 import '../../../Controller/ManagerController.dart';
 
 class TablePage extends StatefulWidget {
+  const TablePage({Key? key}) : super(key: key);
+
   @override
   State<TablePage> createState() => _TablePage();
 }
@@ -62,39 +64,35 @@ class _TablePage extends State<TablePage> {
                       'Loại bàn: ',
                       style: TextStyle(color: Colors.black),
                     ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Radio(
-                              value: 0,
-                              groupValue: _radioVal,
-                              onChanged: (int? value) {
-                                setState(() =>
-                                    _radioVal = int.parse(value.toString()));
-                              }),
-                          const Text(
-                            'Thường',
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Radio(
+                            value: 0,
+                            groupValue: _radioVal,
+                            onChanged: (int? value) {
+                              setState(() =>
+                                  _radioVal = int.parse(value.toString()));
+                            }),
+                        const Text(
+                          'Thường',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
                     ),
-                    Container(
-                      child: Row(
-                        children: [
-                          Radio(
-                              value: 1,
-                              groupValue: _radioVal,
-                              onChanged: (int? value) {
-                                setState(() =>
-                                    _radioVal = int.parse(value.toString()));
-                              }),
-                          const Text(
-                            'Vip',
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      children: [
+                        Radio(
+                            value: 1,
+                            groupValue: _radioVal,
+                            onChanged: (int? value) {
+                              setState(() =>
+                                  _radioVal = int.parse(value.toString()));
+                            }),
+                        const Text(
+                          'Vip',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -275,8 +273,8 @@ class _TablePage extends State<TablePage> {
       child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          color: document?.get('type') != false
-              ? Colors.yellow[600]
+          color: document?.get('isUsing') != false
+              ? kPrimaryColor
               : kSecondaryColor,
           elevation: 10,
           //this lesson will customize this ListItem, using Column and Row
