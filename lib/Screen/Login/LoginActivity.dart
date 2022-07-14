@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:star_restaurant/Components/primary_button.dart';
 import 'package:star_restaurant/Components/loading_daialog.dart';
 import 'package:star_restaurant/Components/msg_dialog.dart';
+import 'package:star_restaurant/Controller/MessagingController.dart';
 import 'package:star_restaurant/Screen/Cashier/CashierActivity.dart';
 import 'package:star_restaurant/Screen/Chef/ChefActiviy.dart';
 import 'package:star_restaurant/Screen/Manager/ManagerActivity.dart';
@@ -21,7 +23,7 @@ class LoginActivity extends StatefulWidget {
 
 class _LoginActivityState extends State<LoginActivity> {
   AuthBloc authBloc = AuthBloc();
-
+  final MessagingController _messagingController = MessagingController();
   bool _passStatetus = true;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -31,22 +33,23 @@ class _LoginActivityState extends State<LoginActivity> {
     _passStatetus = !_passStatetus;
   }
 
-  void _signInAnAccount() {
+  void _signInAnAccount() async {
     String email = _usernameController.text;
     String pass = _passwordController.text;
     var isValid = authBloc.isLoginValid(email, pass);
     if (isValid) {
       LoadingDialog.showLoadingDialog(context, "Loading...");
-      authBloc.signIn(email, pass, () {
+      authBloc.signIn(email, pass, () async {
         LoadingDialog.hideLoadingDialog(context);
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('NhanVien')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
-            .then((value) {
+            .then((value) async {
           if (value.get('role') == "manager") {
             Get.to(const ManagerActivity());
           } else if (value.get('role') == "waiter") {
+            await FirebaseMessaging.instance.subscribeToTopic("food");
             Get.to(const WaiterActivity());
           } else if (value.get('role') == "cashier") {
             Get.to(const CashierActivity());
