@@ -14,8 +14,22 @@ class ChefController {
   }
 
   cancelCooking(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
-      Function(String) onfailure) {
-    monAnDAO.cancel(doc, onSuccess, onfailure);
+      Function(String) onfailure) async {
+    try {
+      monAnDAO.cancel(doc, onSuccess, onfailure);
+      BanAn banAn = BanAn.origin();
+      await FirebaseFirestore.instance
+          .collection("BanAn")
+          .doc(doc.get('idTable'))
+          .get()
+          .then((value) => banAn = BanAn.fromDocument(value));
+      MonAnDaGoi monAnDaGoi = MonAnDaGoi.fromDocument(doc);
+      String title = banAn.name;
+      String body = "Từ chối: " + monAnDaGoi.name;
+      _httpRequest.callOnFcmApiSendPushNotifications(title: title, body: body);
+    } catch (e) {
+      print(e);
+    }
   }
 
   successCooking(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
