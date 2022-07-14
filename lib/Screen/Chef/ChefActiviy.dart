@@ -8,7 +8,6 @@ class ChefActivity extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _ChefActivity();
-
 }
 
 class _ChefActivity extends State<ChefActivity> {
@@ -21,15 +20,14 @@ class _ChefActivity extends State<ChefActivity> {
   }
 
   final List<Widget> _mainBody = [
-     ListNewFood(),
-     ListOffFood(),
+    ListNewFood(),
+    ListOffFood(),
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          backgroundColor: kAppBarColor,
-          title: const Text('KITCHEN')),
+      appBar:
+          AppBar(backgroundColor: kAppBarColor, title: const Text('KITCHEN')),
       body: SafeArea(
         child: _mainBody[_currentIndex],
       ),

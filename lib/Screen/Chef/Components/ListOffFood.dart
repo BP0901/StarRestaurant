@@ -17,7 +17,7 @@ class _ListOffFood extends State<ListOffFood> {
       .snapshots();
   final _banAnCollection = FirebaseFirestore.instance.collection('BanAn');
   ChefController controller = ChefController();
-  String _table='';
+  String _table = '';
   @override
   int _cateIndex = 0;
   List<String> lists = [];
@@ -25,7 +25,7 @@ class _ListOffFood extends State<ListOffFood> {
     _cateIndex = chooseIndex;
   }
 
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Material(
       color: kSupColor,
       child: StreamBuilder<QuerySnapshot>(
@@ -38,7 +38,7 @@ class _ListOffFood extends State<ListOffFood> {
                   valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
                 ),
               );
-            } else  {
+            } else {
               return ListView.builder(
                   padding: const EdgeInsets.all(10),
                   scrollDirection: Axis.vertical,
@@ -51,7 +51,7 @@ class _ListOffFood extends State<ListOffFood> {
     );
   }
 
-  buildCateItem(int index, QueryDocumentSnapshot<Object?>? document){
+  buildCateItem(int index, QueryDocumentSnapshot<Object?>? document) {
     if (document != null) {
       _viewTable(document.get('idTable'));
       return Column(
@@ -79,13 +79,13 @@ class _ListOffFood extends State<ListOffFood> {
                     style: const TextStyle(color: Colors.white),
                   ),
                   Text(
-                    '${_table}',
+                    _table,
                     textScaleFactor: 0.8,
                     style: const TextStyle(color: Colors.white),
                   ),
                 ],
               ),
-              trailing: Icon(
+              trailing: const Icon(
                 Icons.update,
                 color: Colors.red,
               ),
@@ -104,7 +104,7 @@ class _ListOffFood extends State<ListOffFood> {
         .doc(id)
         .get()
         .then<String>((value) => value.get('name'));
-    print(_table);
+    // print(_table);
     // print(await _banAnCollection.doc(id).get().then<String>((value) => value.get('name')));
     return await _table;
   }
@@ -130,7 +130,7 @@ class _ListOffFood extends State<ListOffFood> {
                           style:
                               ElevatedButton.styleFrom(primary: kPrimaryColor),
                           onPressed: () {
-                            controller.successCooking(document.id, () {
+                            controller.successCooking(document, () {
                               Navigator.pop(context);
                             }, (msg) {
                               ScaffoldMessenger.of(context).showSnackBar(

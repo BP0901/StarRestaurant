@@ -13,17 +13,17 @@ class TablePage extends StatefulWidget {
 }
 
 class _TablePage extends State<TablePage> {
-  ManagerController controller= ManagerController();
+  ManagerController controller = ManagerController();
   final _contentController = TextEditingController();
   final _amountController = TextEditingController();
-  Stream<QuerySnapshot> _tableCateStream =
+  final Stream<QuerySnapshot> _tableCateStream =
       FirebaseFirestore.instance.collection('BanAn').snapshots();
-  String _name='';
+  String _name = '';
   int _radioVal = 0;
-  double _slider2Val = 50.0;
+  final double _slider2Val = 50.0;
   //define states
-  BanAn _table = BanAn(id: '', name: '', type: true);
-  List<BanAn> _tables = List<BanAn>.empty();
+  BanAn _table = BanAn.origin();
+  final List<BanAn> _tables = List<BanAn>.empty();
 
   void _insertTransaction() {
     //You must validate information first
@@ -31,7 +31,7 @@ class _TablePage extends State<TablePage> {
       return;
     }
     _tables.add(_table);
-    _table = BanAn(id: '', name: '', type: true);
+    _table = BanAn.origin();
     _contentController.text = '';
     _amountController.text = '';
   }
@@ -43,22 +43,22 @@ class _TablePage extends State<TablePage> {
           return Column(
             children: <Widget>[
               Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: TextField(
-                    decoration: InputDecoration(labelText: 'Name'),
+                    decoration: const InputDecoration(labelText: 'Name'),
                     controller: _contentController,
                     onChanged: (text) {
                       setState(() {
-                        _name=text;
+                        _name = text;
                       });
                     },
                   )),
               const Divider(),
               Container(
-                padding: EdgeInsets.only(left: 15, right: 20),
+                padding: const EdgeInsets.only(left: 15, right: 20),
                 child: Row(
                   children: [
-                    Text(
+                    const Text(
                       'Loại bàn: ',
                       style: TextStyle(color: Colors.black),
                     ),
@@ -72,7 +72,7 @@ class _TablePage extends State<TablePage> {
                                 setState(() =>
                                     _radioVal = int.parse(value.toString()));
                               }),
-                          Text(
+                          const Text(
                             'Thường',
                             style: TextStyle(color: Colors.black),
                           ),
@@ -89,7 +89,7 @@ class _TablePage extends State<TablePage> {
                                 setState(() =>
                                     _radioVal = int.parse(value.toString()));
                               }),
-                          Text(
+                          const Text(
                             'Vip',
                             style: TextStyle(color: Colors.black),
                           ),
@@ -101,7 +101,7 @@ class _TablePage extends State<TablePage> {
               ),
               const Divider(),
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
@@ -109,16 +109,17 @@ class _TablePage extends State<TablePage> {
                         child: SizedBox(
                       child: RaisedButton(
                         color: Colors.teal,
-                        child: Text(
+                        child: const Text(
                           'Save',
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                         onPressed: () {
                           print('press Save');
                           setState(() {
-                            controller.addTable(_name, _radioVal!=1?false:true, () {
+                            controller.addTable(
+                                _name, _radioVal != 1 ? false : true, () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: FlashMessageScreen(
                                       type: "Thông báo",
                                       content: "Thêm thành công!",
@@ -149,12 +150,12 @@ class _TablePage extends State<TablePage> {
                       ),
                       height: 50,
                     )),
-                    Padding(padding: EdgeInsets.only(left: 10)),
+                    const Padding(padding: EdgeInsets.only(left: 10)),
                     Expanded(
                         child: SizedBox(
                       child: RaisedButton(
                         color: Colors.pinkAccent,
-                        child: Text(
+                        child: const Text(
                           'Cancel',
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
@@ -181,10 +182,10 @@ class _TablePage extends State<TablePage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: kAppBarColor,
-          title: Text('Quản lý bàn ăn'),
+          title: const Text('Quản lý bàn ăn'),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.add),
+              icon: const Icon(Icons.add),
               onPressed: () {
                 this._onButtonShowModalSheet();
               },
@@ -227,22 +228,22 @@ class _TablePage extends State<TablePage> {
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Xác nhận xóa'),
-              content: Text('Bạn có muốn xóa ${document?.get('name')}'),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () => Navigator.pop(context, 'Cancel'),
-                    child: const Text('Cancel')),
-                FlatButton(
-                    onPressed: () => Navigator.pop(context, 'OK'),
-                    child: const Text('OK'))
-              ],
-            )).then((value) {
+                  title: const Text('Xác nhận xóa'),
+                  content: Text('Bạn có muốn xóa ${document?.get('name')}'),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () => Navigator.pop(context, 'Cancel'),
+                        child: const Text('Cancel')),
+                    FlatButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK'))
+                  ],
+                )).then((value) {
           if (value != null) {
-            if(value=='OK'){
+            if (value == 'OK') {
               controller.deleteTable(document?.get('id'), () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: FlashMessageScreen(
                         type: "Thông báo",
                         content: "Xóa thành công!",
@@ -256,9 +257,7 @@ class _TablePage extends State<TablePage> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: FlashMessageScreen(
-                        type: "Thông báo",
-                        content: msg,
-                        color: kPrimaryColor),
+                        type: "Thông báo", content: msg, color: kPrimaryColor),
                     behavior: SnackBarBehavior.floating,
                     backgroundColor: Colors.transparent,
                     elevation: 0,
@@ -274,7 +273,8 @@ class _TablePage extends State<TablePage> {
         // _onButtonShowModalSheet(_name,_username,_role,document)
       },
       child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           color: document?.get('type') != false
               ? Colors.yellow[600]
               : kSecondaryColor,
@@ -283,45 +283,47 @@ class _TablePage extends State<TablePage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(10),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(padding: EdgeInsets.only(top: 10)),
+                  const Padding(padding: EdgeInsets.only(top: 10)),
                   Text(
                     '${document?.get('name')}',
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: Colors.white),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                 ],
               ),
               Expanded(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Text(
-                            'Loại bàn: ${document?.get('type') != false ? 'Vip' : 'Thường'}',
-                            style: TextStyle(fontSize: 18, color: Colors.white)),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.white,
-                                width: 2,
-                                style: BorderStyle.solid),
-                            borderRadius: BorderRadius.all(Radius.circular(10))),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 10),
-                      )
-                    ],
-                  ))
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Text(
+                        'Loại bàn: ${document?.get('type') != false ? 'Vip' : 'Thường'}',
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                            style: BorderStyle.solid),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10))),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(right: 10),
+                  )
+                ],
+              ))
             ],
           )),
     );

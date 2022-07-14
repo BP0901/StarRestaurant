@@ -30,7 +30,7 @@ Widget buildFoodItem(BuildContext context, int index,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Image.network(
-                      document?.get('image'),
+                      document.get('image'),
                       height: 100,
                       width: 100,
                     ),
@@ -43,7 +43,7 @@ Widget buildFoodItem(BuildContext context, int index,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        '${document?.get('name')}',
+                        '${document.get('name')}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -52,27 +52,27 @@ Widget buildFoodItem(BuildContext context, int index,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Đơn vị: ${document?.get('unit')}',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white)),
+                          Text('Đơn vị: ${document.get('unit')}',
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white)),
                           Expanded(
                               child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
                               Container(
                                 padding: const EdgeInsets.all(10.0),
-                                child: Text('Price: ${document?.get('price')}',
-                                    style: TextStyle(
+                                child: Text('Price: ${document.get('price')}',
+                                    style: const TextStyle(
                                         fontSize: 18, color: Colors.white)),
                                 decoration: BoxDecoration(
                                     border: Border.all(
                                         color: Colors.white,
                                         width: 1,
                                         style: BorderStyle.solid),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10))),
                               ),
-                              Padding(
+                              const Padding(
                                 padding: EdgeInsets.only(right: 10),
                               )
                             ],
@@ -96,7 +96,7 @@ Widget buildFoodItem(BuildContext context, int index,
           _deleteFood(context, document);
         },
         onTap: () {
-          _infoFood(context, document!);
+          _infoFood(context, document);
           // _infoStaff(context, document.id, _name, _role, _gender, _locker,
           //     formatBirth.format(_birth), _username, document);
         },
@@ -115,7 +115,7 @@ Widget buildFoodItem(BuildContext context, int index,
                   child: Padding(
                     padding: const EdgeInsets.all(5),
                     child: Image.network(
-                      document?.get('image'),
+                      document.get('image'),
                       height: 100,
                       width: 100,
                     ),
@@ -128,7 +128,7 @@ Widget buildFoodItem(BuildContext context, int index,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        '${document?.get('name')}',
+                        '${document.get('name')}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -137,31 +137,31 @@ Widget buildFoodItem(BuildContext context, int index,
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text('Đơn vị: ${document?.get('unit')}',
-                              style:
-                              TextStyle(fontSize: 18, color: Colors.white)),
+                          Text('Đơn vị: ${document.get('unit')}',
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white)),
                           Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Container(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Text('Price: ${document?.get('price')}',
-                                        style: TextStyle(
-                                            fontSize: 18, color: Colors.white)),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                            style: BorderStyle.solid),
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(10))),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(right: 10),
-                                  )
-                                ],
-                              ))
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Container(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Text('Price: ${document.get('price')}',
+                                    style: const TextStyle(
+                                        fontSize: 18, color: Colors.white)),
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                        style: BorderStyle.solid),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10))),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(right: 10),
+                              )
+                            ],
+                          ))
                         ],
                       ),
                     ],
@@ -177,7 +177,7 @@ Widget buildFoodItem(BuildContext context, int index,
 }
 
 _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
-   showDialog(
+  showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
             elevation: 24,
@@ -198,7 +198,7 @@ _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
                       style: TextStyle(color: Colors.white),
                     ),
                     Text(
-                      document!.get('id').toString(),
+                      document.get('id').toString(),
                       style: const TextStyle(color: kPrimaryColor),
                     ),
                   ],
@@ -210,7 +210,7 @@ _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
                       style: TextStyle(color: Colors.white),
                     ),
                     Text(
-                      document!.get('price').toString(),
+                      document.get('price').toString(),
                       style: const TextStyle(color: kPrimaryColor),
                     ),
                   ],
@@ -243,22 +243,23 @@ _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
             ),
           ));
 }
+
 void _deleteFood(BuildContext context, DocumentSnapshot? document) {
   ManagerController controller = ManagerController();
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có muốn xóa ${document!.get('name')}'),
-        actions: <Widget>[
-          FlatButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text('Cancel')),
-          FlatButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'))
-        ],
-      )).then((value) {
+            title: const Text('Xác nhận xóa'),
+            content: Text('Bạn có muốn xóa ${document!.get('name')}'),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () => Navigator.pop(context, 'Cancel'),
+                  child: const Text('Cancel')),
+              FlatButton(
+                  onPressed: () => Navigator.pop(context, 'OK'),
+                  child: const Text('OK'))
+            ],
+          )).then((value) {
     if (value != null) {
       if (value == 'OK') {
         controller.deleteStaff(document!.id, () {

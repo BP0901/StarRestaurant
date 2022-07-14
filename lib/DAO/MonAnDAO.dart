@@ -7,10 +7,11 @@ class MonAnDAO {
       FirebaseFirestore.instance.collection('MonAn');
   final String? id;
   MonAnDAO({this.id});
-  Future confirm(
-      String id, Function onSuccess, Function(String) onError) async {
+
+  Future confirm(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
+      Function(String) onError) async {
     return await conllectionMADXN
-        .doc(id)
+        .doc(doc.id)
         .update({
           'status': 'cooking',
         })
@@ -20,9 +21,10 @@ class MonAnDAO {
         });
   }
 
-  Future cancel(String id, Function onSuccess, Function(String) onError) async {
+  Future cancel(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
+      Function(String) onError) async {
     return await conllectionMADXN
-        .doc(id)
+        .doc(doc.id)
         .update({
           'status': 'cancel',
         })
@@ -32,12 +34,12 @@ class MonAnDAO {
         });
   }
 
-  Future success(
-      String id, Function onSuccess, Function(String) onError) async {
+  Future success(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
+      Function(String) onError) async {
     return await conllectionMADXN
-        .doc(id)
+        .doc(doc.id)
         .update({
-          'status': 'cuccess',
+          'status': 'done',
         })
         .then((value) => onSuccess())
         .catchError((onError) {
@@ -47,23 +49,19 @@ class MonAnDAO {
 
   Future add(String name, String image, int price, int discount, String type,
       String unit, Function onSuccess, Function(String) onfailure) {
-
     return conllectionMonAn.add({
       'name': name,
       'image': image,
       'price': price,
       'discount': discount,
     }).then((value) {
-      conllectionMonAn.doc(value.id).update({'id': value.id,
-      'type':FirebaseFirestore.instance
-          .collection('LoaiMonAn')
-          .where("name", isEqualTo: 'Nước uống')
-          .get()
-          .then((loais) => {
-      loais.docs.forEach((loai) {
-
-      })
-      })
+      conllectionMonAn.doc(value.id).update({
+        'id': value.id,
+        'type': FirebaseFirestore.instance
+            .collection('LoaiMonAn')
+            .where("name", isEqualTo: 'Nước uống')
+            .get()
+            .then((loais) => {loais.docs.forEach((loai) {})})
       });
 
       onSuccess();
