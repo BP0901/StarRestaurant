@@ -23,12 +23,12 @@ class ListTileCustom extends StatelessWidget {
           shape: BoxShape.circle,
           color: bgColor,
         ),
-        // child: SvgPicture.asset(
-        //   "assets/icon/" + pathIcon,
-        //   width: 21.88,
-        //   height: 10.94,
-        //   fit: BoxFit.scaleDown,
-        // ),
+        child: SvgPicture.asset(
+          "assets/icon/" + pathIcon,
+          width: 21.88,
+          height: 10.94,
+          fit: BoxFit.scaleDown,
+        ),
       ),
       title: Text(
         title,

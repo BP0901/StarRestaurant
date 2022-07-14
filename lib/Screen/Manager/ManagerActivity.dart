@@ -38,6 +38,7 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+
                           SizedBox(
                             width: size.width / 2 - 20,
                             child: Column(
@@ -97,9 +98,9 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                             width: size.width / 2 - 20,
                             height: 180,
                             decoration: const BoxDecoration(
-                                // image: DecorationImage(
-                                //     image: AssetImage(
-                                //         "assets/images/people.png"))
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/people.png"))
                                 ),
                           )
                         ],
@@ -262,11 +263,10 @@ class _ManagermentActivityState extends State<ManagerActivity> {
                                         bottomLeft: Radius.circular(15),
                                         bottomRight: Radius.circular(15),
                                       ),
-
-                                      // image: DecorationImage(
-                                      //     image: AssetImage(
-                                      //         "assets/images/graph.png"),
-                                      //     fit: BoxFit.fill)
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/graph.png"),
+                                          fit: BoxFit.fill)
                                     ),
                                   )
                                 ],
