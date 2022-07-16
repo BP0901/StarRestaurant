@@ -392,7 +392,7 @@ Future<dynamic> _changeToNewTable(BuildContext context,
                                   TextButton(
                                     onPressed: () {
                                       Navigator.pop(listAvailableTableDialog);
-                                      waiterController.changeToNewTable(
+                                      waiterController. changeToNewTable(
                                           tableFood.get('id'),
                                           snapshot.data?.docs[index].get('id'),
                                           () {

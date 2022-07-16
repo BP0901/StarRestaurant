@@ -93,4 +93,11 @@ class NhanVienDAO {
           onError("Cập nhật thất bại");
         });
   }
+
+  Future<NhanVien> getNhanVienById(String userId) async {
+    NhanVien nhanVien = NhanVien.origin();
+    await staffConllection.doc(userId).get().then((value) => nhanVien = NhanVien.fromDocument(value));
+    return nhanVien;
+  }
+
 }

@@ -28,7 +28,7 @@ class AuthBloc {
     return true;
   }
 
-  void signIn(String email, String pass, Function onSuccess,
+  void signIn(String email, String pass, Function(String) onSuccess,
       Function(String) onSignInError) {
     _loginController.signIn(email, pass, onSuccess, onSignInError);
   }

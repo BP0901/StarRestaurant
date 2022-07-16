@@ -39,24 +39,21 @@ class _LoginActivityState extends State<LoginActivity> {
     var isValid = authBloc.isLoginValid(email, pass);
     if (isValid) {
       LoadingDialog.showLoadingDialog(context, "Loading...");
-      authBloc.signIn(email, pass, () async {
-        LoadingDialog.hideLoadingDialog(context);
-        await FirebaseFirestore.instance
-            .collection('NhanVien')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get()
-            .then((value) async {
-          if (value.get('role') == "manager") {
+      authBloc.signIn(email, pass, (role) async {
+          if (role == "manager") {
+            LoadingDialog.hideLoadingDialog(context);
             Get.to(const ManagerActivity());
-          } else if (value.get('role') == "waiter") {
+          } else if (role == "waiter") {
             await FirebaseMessaging.instance.subscribeToTopic("food");
+            LoadingDialog.hideLoadingDialog(context);
             Get.to(const WaiterActivity());
-          } else if (value.get('role') == "cashier") {
+          } else if (role == "cashier") {
+            LoadingDialog.hideLoadingDialog(context);
             Get.to(const CashierActivity());
-          } else if (value.get('role') == "chef") {
+          } else if (role == "chef") {
+            LoadingDialog.hideLoadingDialog(context);
             Get.to(const ChefActivity());
           }
-        });
       }, (msg) {
         LoadingDialog.hideLoadingDialog(context);
         MsgDialog.showMsgDialog(context, "Sign-In", msg);
