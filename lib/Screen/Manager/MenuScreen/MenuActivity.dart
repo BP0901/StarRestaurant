@@ -23,22 +23,22 @@ class _MenuPage extends State<MenuPage> {
     _cateIndex = chooseIndex;
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     //In this lesson, we need to add AppBar and more "Add" button
     //This must be Scaffold!. not MaterialApp !
     return Scaffold(
-      drawer: DrawerMGTM(),
+      drawer: const DrawerMGTM(),
       appBar: AppBar(
         backgroundColor: kAppBarColor,
         title: const Text('Quản lý thực đơn'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EditMenu(
+                  builder: (context) => const EditMenu(
                         food: null,
                       ) //you can send parameters using constructor
                   ));

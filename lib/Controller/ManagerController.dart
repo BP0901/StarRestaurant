@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:star_restaurant/DAO/MonAnDAO.dart';
 import 'package:star_restaurant/DAO/NhanVienDAO.dart';
 import 'package:star_restaurant/DAO/BanAnDAO.dart';
+import 'package:star_restaurant/Model/MonAn.dart';
 import '../DAO/FirebaseAuth.dart';
 
 class ManagerController {
@@ -55,11 +56,10 @@ class ManagerController {
         id, name, gender, birth, role, onSuccess, onfailure);
   }
 
-  void addFood(String name, String image, int price, int discount, String type,
-      String unit, Function onSuccess, Function(String) onfailure) async {
+  void addFood(MonAn monAn, Function onSuccess, Function(String) onfailure) async {
     try {
       monAnDAO.add(
-          name, image, price, discount, type, unit, onSuccess, onfailure);
+          monAn, onSuccess, onfailure);
     } catch (e) {}
   }
 

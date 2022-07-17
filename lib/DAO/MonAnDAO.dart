@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:star_restaurant/Model/MonAn.dart';
 
 class MonAnDAO {
   final CollectionReference conllectionMADXN =
@@ -47,23 +48,18 @@ class MonAnDAO {
         });
   }
 
-  Future add(String name, String image, int price, int discount, String type,
-      String unit, Function onSuccess, Function(String) onfailure) {
+  Future add(MonAn monAn, Function onSuccess, Function(String) onfailure) {
+    print(monAn.type);
     return conllectionMonAn.add({
-      'name': name,
-      'image': image,
-      'price': price,
-      'discount': discount,
+      'name': monAn.name,
+      'image': monAn.image,
+      'price': monAn.price,
+      'discount': monAn.discount,
+      'type': monAn.type
     }).then((value) {
-      conllectionMonAn.doc(value.id).update({
-        'id': value.id,
-        'type': FirebaseFirestore.instance
-            .collection('LoaiMonAn')
-            .where("name", isEqualTo: 'Nước uống')
-            .get()
-            .then((loais) => {loais.docs.forEach((loai) {})})
-      });
-
+      conllectionMonAn
+          .doc(value.id)
+          .set({"id": value.id}, SetOptions(merge: true));
       onSuccess();
     }).catchError((onError) {
       print("err: " + onError.toString());
