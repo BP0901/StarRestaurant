@@ -249,20 +249,33 @@ void _deleteFood(BuildContext context, DocumentSnapshot? document) {
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Xác nhận xóa'),
-            content: Text('Bạn có muốn xóa ${document!.get('name')}'),
+            backgroundColor: kSupColor,
+            title: const Text(
+              'Xác nhận xóa',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: Text(
+              'Bạn có muốn xóa ${document!.get('name')}',
+              style: const TextStyle(color: Colors.white),
+            ),
             actions: <Widget>[
               FlatButton(
                   onPressed: () => Navigator.pop(context, 'Cancel'),
-                  child: const Text('Cancel')),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: kPrimaryColor),
+                  )),
               FlatButton(
                   onPressed: () => Navigator.pop(context, 'OK'),
-                  child: const Text('OK'))
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: kPrimaryColor),
+                  ))
             ],
           )).then((value) {
     if (value != null) {
       if (value == 'OK') {
-        controller.deleteStaff(document!.id, () {
+        controller.deleteFood(document!.id, () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: FlashMessageScreen(

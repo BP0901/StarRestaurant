@@ -40,9 +40,9 @@ class ManagerController {
     banAnDAO.deleteTable(id, onSuccess, onfailure);
   }
 
-  void deleteFoot(
+  void deleteFood(
       String id, Function onSuccess, Function(String) onfailure) async {
-    nhanVienDAO.deleteStaff(id, onSuccess, onfailure);
+    monAnDAO.delete(id, onSuccess, onfailure);
   }
 
   void addTable(String name, bool type, Function onSuccess,
