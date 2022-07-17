@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:star_restaurant/DAO/LoaiMonAnDAO.dart';
 import 'package:star_restaurant/DAO/MonAnDAO.dart';
 import 'package:star_restaurant/DAO/NhanVienDAO.dart';
 import 'package:star_restaurant/DAO/BanAnDAO.dart';
+import 'package:star_restaurant/Model/LoaiMonAn.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
 import '../DAO/FirebaseAuth.dart';
 
@@ -10,6 +12,7 @@ class ManagerController {
   NhanVienDAO nhanVienDAO = NhanVienDAO();
   BanAnDAO banAnDAO = BanAnDAO();
   MonAnDAO monAnDAO = MonAnDAO();
+  LoaiMonAnDAO loaiMonAnDAO = LoaiMonAnDAO();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   void addStaff(
       String name,
@@ -56,10 +59,12 @@ class ManagerController {
         id, name, gender, birth, role, onSuccess, onfailure);
   }
 
-  void addFood(MonAn monAn, Function onSuccess, Function(String) onfailure) async {
+  void addFood(
+      MonAn monAn, Function onSuccess, Function(String) onfailure) async {
+    LoaiMonAn loaiMonAn = await loaiMonAnDAO.getLoaiMonAnByID(monAn.type);
+    monAn.type = loaiMonAn.id;
     try {
-      monAnDAO.add(
-          monAn, onSuccess, onfailure);
+      monAnDAO.add(monAn, onSuccess, onfailure);
     } catch (e) {}
   }
 
@@ -72,8 +77,10 @@ class ManagerController {
       String type,
       String unit,
       Function onSuccess,
-      Function(String) onfailure) async{
+      Function(String) onfailure) async {
     monAnDAO.update(
         id, name, image, price, discount, type, unit, onSuccess, onfailure);
   }
+
+  Future<List<LoaiMonAn>> getListCates() async => loaiMonAnDAO.getLisstCates();
 }

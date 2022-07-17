@@ -49,13 +49,13 @@ class MonAnDAO {
   }
 
   Future add(MonAn monAn, Function onSuccess, Function(String) onfailure) {
-    print(monAn.type);
     return conllectionMonAn.add({
       'name': monAn.name,
       'image': monAn.image,
       'price': monAn.price,
       'discount': monAn.discount,
-      'type': monAn.type
+      'type': monAn.type,
+      'unit': monAn.unit
     }).then((value) {
       conllectionMonAn
           .doc(value.id)

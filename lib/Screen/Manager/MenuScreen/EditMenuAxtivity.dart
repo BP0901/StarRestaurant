@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
 import '../../../Components/flash_message.dart';
+import '../../../Model/LoaiMonAn.dart';
 import '../../../Util/Constants.dart';
 import '../../../Controller/ManagerController.dart';
 
@@ -25,49 +26,23 @@ class _editMenu extends State<EditMenu> {
   String imageUrl = "";
   DocumentSnapshot? food;
   File? imageFile;
+  late Future<List<LoaiMonAn>> listCates;
   ManagerController controller = ManagerController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _nameEditingController = TextEditingController();
   final _priceEditingController = TextEditingController();
   final _discountEditingController = TextEditingController();
+  final _unitEditingController = TextEditingController();
   String _type = 'hap';
   String _name = '';
   int _price = 0;
   String _unit = 'chai';
   String _fid = '';
   int _discount = 0;
-  final List<DropdownMenuItem<String>> _dropDownLoaiMon = <String>[
-    'hap',
-    'Chiên',
-    'Lẩu',
-    'Khai vị',
-    'Nướng',
-    'Nước uống'
-  ].map<DropdownMenuItem<String>>((String value) {
-    return DropdownMenuItem<String>(
-      value: value,
-      child: Text(
-        value,
-        style: const TextStyle(color: Colors.blue),
-      ),
-    );
-  }).toList();
-  final List<DropdownMenuItem<String>> _dropDownDonVi = <String>[
-    'chai',
-    'phần',
-    'dĩa',
-  ].map<DropdownMenuItem<String>>((String value) {
-    return DropdownMenuItem<String>(
-      value: value,
-      child: Text(
-        value,
-        style: const TextStyle(color: Colors.blue),
-      ),
-    );
-  }).toList();
   @override
   void initState() {
     super.initState();
+    listCates = controller.getListCates();
     food = widget.food;
     if (food != null) {
       _fid = food!.id;
@@ -170,42 +145,64 @@ class _editMenu extends State<EditMenu> {
                                 Radius.circular(10),
                               ),
                             ),
-                            labelText: 'Discount',
+                            labelText: 'Giá sau giảm',
                             labelStyle: TextStyle(color: Colors.white),
                           ),
                         ),
                         const Padding(padding: EdgeInsets.only(bottom: 10)),
-                        ListTile(
-                          title: const Text(
-                            'Loại món ăn:',
-                            style: TextStyle(color: Colors.white),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Loại món ăn:',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                _type,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              FutureBuilder<List<LoaiMonAn>>(
+                                  future: listCates,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      _type = snapshot.data![0].name;
+                                      return DropdownButton(
+                                        value: _type,
+                                        onChanged: (value) => setState(
+                                            () => _type = value.toString()),
+                                        items: snapshot.data!
+                                            .map((cate) =>
+                                                DropdownMenuItem<String>(
+                                                  child: Text(cate.name),
+                                                  value: cate.name,
+                                                ))
+                                            .toList(),
+                                      );
+                                    }
+                                    return const SizedBox.shrink();
+                                  }),
+                            ],
                           ),
-                          trailing: DropdownButton(
-                            value: _type,
-                            onChanged: (String? value) {
-                              setState(() {
-                                _type = value.toString();
-                              });
-                            },
-                            items: _dropDownLoaiMon,
+                        ),
+                        TextField(
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w300),
+                          controller: _unitEditingController,
+                          onChanged: (unit) => setState(() => _unit = unit),
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            labelText: 'Đơn vị tính:',
+                            labelStyle: TextStyle(color: Colors.white),
                           ),
                         ),
                         const Padding(padding: EdgeInsets.only(bottom: 10)),
-                        ListTile(
-                          title: const Text(
-                            'Đơn vị tính:',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          trailing: DropdownButton(
-                            value: _unit,
-                            onChanged: (String? unit) {
-                              setState(() {
-                                _unit = unit.toString();
-                              });
-                            },
-                            items: _dropDownDonVi,
-                          ),
-                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -356,40 +353,64 @@ class _editMenu extends State<EditMenu> {
                           Radius.circular(10),
                         ),
                       ),
-                      labelText: 'Discount',
+                      labelText: 'Giá sau giảm',
                       labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 10)),
-                  ListTile(
-                    title: const Text(
-                      'Loại món ăn:',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    trailing: DropdownButton(
-                      value: _type,
-                      onChanged: (String? value) {
-                        setState(() {
-                          _type = value.toString();
-                        });
-                      },
-                      items: _dropDownLoaiMon,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Loại món ăn:',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          _type,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        FutureBuilder<List<LoaiMonAn>>(
+                            future: listCates,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                _type = snapshot.data![0].name;
+                                return DropdownButton(
+                                  value: _type,
+                                  onChanged: (value) =>
+                                      setState(() => _type = value.toString()),
+                                  items: snapshot.data!
+                                      .map((cate) => DropdownMenuItem<String>(
+                                            child: Text(cate.name),
+                                            value: cate.name,
+                                          ))
+                                      .toList(),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }),
+                      ],
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 10)),
-                  ListTile(
-                    title: const Text(
-                      'Đơn vị tính:',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    trailing: DropdownButton(
-                      value: _unit,
-                      onChanged: (String? unit) {
-                        setState(() {
-                          _unit = unit.toString();
-                        });
-                      },
-                      items: _dropDownDonVi,
+                  TextField(
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w300),
+                    controller: _unitEditingController,
+                    onChanged: (unit) => setState(() {
+                      _unit = unit
+                          .toString(); //when state changed => build() rerun => reload widget
+                    }),
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      labelText: 'Đơn vị tính:',
+                      labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -477,6 +498,7 @@ class _editMenu extends State<EditMenu> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
       setState(() {
+        imageName = fileName;
         isLoading = false;
       });
     } on FirebaseException catch (e) {
