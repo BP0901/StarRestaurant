@@ -18,10 +18,6 @@ class _MenuPage extends State<MenuPage> {
   String _findingValue = "";
   final Stream<QuerySnapshot> _foodCateStream =
       FirebaseFirestore.instance.collection('MonAn').snapshots();
-  int _cateIndex = -1;
-  chooseCategory(chooseIndex) {
-    _cateIndex = chooseIndex;
-  }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
