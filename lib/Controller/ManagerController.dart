@@ -6,6 +6,7 @@ import 'package:star_restaurant/DAO/NhanVienDAO.dart';
 import 'package:star_restaurant/DAO/BanAnDAO.dart';
 import 'package:star_restaurant/Model/LoaiMonAn.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
+import 'package:star_restaurant/Model/NhanVien.dart';
 import '../DAO/FirebaseAuth.dart';
 
 class ManagerController {
@@ -15,18 +16,11 @@ class ManagerController {
   LoaiMonAnDAO loaiMonAnDAO = LoaiMonAnDAO();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   void addStaff(
-      String name,
-      int gender,
-      DateTime birth,
-      String role,
-      bool disable,
-      String username,
+      NhanVien nhanVien,
       Function onSuccess,
       Function(String) onfailure) async {
-    String password = '123456';
     try {
-      nhanVienDAO.createStaff(name, gender, birth, password, role, disable,
-          username, onSuccess, onfailure);
+      nhanVienDAO.createStaff(nhanVien, onSuccess, onfailure);
     } catch (e) {}
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:star_restaurant/Model/NhanVien.dart';
 import '../../../Components/flash_message.dart';
 import '../../../Util/Constants.dart';
 import '../../../Controller/ManagerController.dart';
@@ -20,7 +21,9 @@ class _addStaff extends State<AddStaff> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _nameEditingController = TextEditingController();
   final _userNameEditingController = TextEditingController();
+  final _passEditingController = TextEditingController();
   final _dateEditingController = TextEditingController();
+  String _password = "";
   String _role = 'waiter';
   String _name = '';
   int _gender = 0;
@@ -40,7 +43,7 @@ class _addStaff extends State<AddStaff> {
       _birth = _date.toDate();
       _nameEditingController.text = _name;
       _userNameEditingController.text = _username;
-      _dateEditingController.text=DateFormat.yMd().format(this._birth);
+      _dateEditingController.text = DateFormat.yMd().format(_birth);
     }
   }
 
@@ -56,81 +59,102 @@ class _addStaff extends State<AddStaff> {
           body: SafeArea(
             child: Container(
               color: kSupColor,
-              padding:
-                  EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
+              padding: const EdgeInsets.only(
+                  right: 10, bottom: 20, left: 10, top: 10),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'THÔNG TIN NHÂN VIÊN',
                     style: TextStyle(
                         color: kSuccessColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 26),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   TextField(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w300),
                     controller: _nameEditingController,
                     onChanged: (text) {
-                      this.setState(() {
+                      setState(() {
                         _name =
                             text; //when state changed => build() rerun => reload widget
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(10),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
                         ),
                       ),
                       labelText: 'Tên nhân viên',
                       labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   TextField(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w300),
                     controller: _userNameEditingController,
                     onChanged: (text) {
-                      this.setState(() {
+                      setState(() {
                         _username =
                             text; //when state changed => build() rerun => reload widget
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(10),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
                         ),
                       ),
                       labelText: 'Tên tài khoản',
                       labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
+                  TextField(
+                    obscureText: true,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w300),
+                    controller: _passEditingController,
+                    onChanged: (text) {
+                      setState(() => _password =
+                              text //when state changed => build() rerun => reload widget
+                          );
+                    },
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                      ),
+                      labelText: 'Mật khẩu',
+                      labelStyle: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   Container(
-                    padding: EdgeInsets.only(left: 15),
+                    padding: const EdgeInsets.only(left: 15),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Ngày sinh: ',
                           style: TextStyle(color: Colors.white),
                         ),
                         Expanded(
                           child: TextField(
                             enabled: false,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w300),
                             controller: _dateEditingController,
                           ),
                         ),
-                        Padding(padding: EdgeInsets.only(left: 10)),
+                        const Padding(padding: EdgeInsets.only(left: 10)),
                         RaisedButton(
                           splashColor: Colors.greenAccent,
-                          child: Icon(Icons.wysiwyg),
+                          child: const Icon(Icons.wysiwyg),
                           onPressed: () {
                             showDatePicker(
                               context: context,
@@ -141,8 +165,9 @@ class _addStaff extends State<AddStaff> {
                               if (value != null) {
                                 DateTime _fromDate = DateTime.now();
                                 _fromDate = value;
-                                this._birth = _fromDate;
-                                _dateEditingController.text=DateFormat.yMd().format(this._birth);
+                                _birth = _fromDate;
+                                _dateEditingController.text =
+                                    DateFormat.yMd().format(_birth);
                               }
                             });
                           },
@@ -150,53 +175,49 @@ class _addStaff extends State<AddStaff> {
                       ],
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                   Container(
-                    padding: EdgeInsets.only(left: 15, right: 20),
+                    padding: const EdgeInsets.only(left: 15, right: 20),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Giới tính: ',
                           style: TextStyle(color: Colors.white),
                         ),
-                        Container(
-                          child: Row(
-                            children: [
-                              Radio(
-                                  value: 0,
-                                  groupValue: _gender,
-                                  onChanged: (int? value) {
-                                    setState(() => this._gender =
-                                        int.parse(value.toString()));
-                                  }),
-                              Text(
-                                'nam',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            Radio(
+                                value: 0,
+                                groupValue: _gender,
+                                onChanged: (int? value) {
+                                  setState(() =>
+                                      _gender = int.parse(value.toString()));
+                                }),
+                            const Text(
+                              'nam',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
                         ),
-                        Container(
-                          child: Row(
-                            children: [
-                              Radio(
-                                  value: 1,
-                                  groupValue: _gender,
-                                  onChanged: (int? value) {
-                                    setState(() => this._gender =
-                                        int.parse(value.toString()));
-                                  }),
-                              Text(
-                                'nữ',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            Radio(
+                                value: 1,
+                                groupValue: _gender,
+                                onChanged: (int? value) {
+                                  setState(() =>
+                                      _gender = int.parse(value.toString()));
+                                }),
+                            const Text(
+                              'nữ',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                   ListTile(
                     title: const Text(
                       'Chức vụ:',
@@ -216,34 +237,42 @@ class _addStaff extends State<AddStaff> {
                           value: value,
                           child: Text(
                             value,
-                            style: TextStyle(color: Colors.blue),
+                            style: const TextStyle(color: Colors.blue),
                           ),
                         );
                       }).toList(),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                 ],
               ),
             ),
           ),
           bottomNavigationBar: Container(
             color: kSupColor,
-            padding: EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 10),
             child: MaterialButton(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(40)),
               ),
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               height: 50,
               color: kSuccessColor,
               minWidth: double.infinity,
               onPressed: () {
-                controller.addStaff(
-                    _name, _gender, _birth, _role, false, _username, () {
+                NhanVien nhanVien = NhanVien(
+                    id: "",
+                    name: _name,
+                    gender: _gender,
+                    birth: _birth,
+                    username: _username,
+                    password: _password,
+                    role: _role,
+                    disable: false);
+                controller.addStaff(nhanVien, () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: FlashMessageScreen(
                           type: "Thông báo",
                           content: "Cập nhật thành công!",
@@ -268,9 +297,9 @@ class _addStaff extends State<AddStaff> {
                   );
                 });
               },
-              child: Text(
-                'Cập nhật',
-                style: const TextStyle(color: Colors.white),
+              child: const Text(
+                'Thêm mới',
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ));
@@ -284,81 +313,81 @@ class _addStaff extends State<AddStaff> {
           body: SafeArea(
             child: Container(
               color: kSupColor,
-              padding:
-                  EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
+              padding: const EdgeInsets.only(
+                  right: 10, bottom: 20, left: 10, top: 10),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     'SỬA THÔNG TIN NHÂN VIÊN',
                     style: TextStyle(
                         color: kSuccessColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 26),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   TextField(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w300),
                     controller: _nameEditingController,
                     onChanged: (text) {
-                      this.setState(() {
+                      setState(() {
                         _name =
                             text; //when state changed => build() rerun => reload widget
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(10),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
                         ),
                       ),
                       labelText: 'Tên nhân viên',
                       labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 20)),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
                   TextField(
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w300),
                     controller: _userNameEditingController,
                     onChanged: (text) {
-                      this.setState(() {
+                      setState(() {
                         _username =
                             text; //when state changed => build() rerun => reload widget
                       });
                     },
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(10),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
                         ),
                       ),
                       labelText: 'Tên tài khoản',
                       labelStyle: TextStyle(color: Colors.white),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                   Container(
-                    padding: EdgeInsets.only(left: 15),
+                    padding: const EdgeInsets.only(left: 15),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Ngày sinh: ',
                           style: TextStyle(color: Colors.white),
                         ),
                         Expanded(
                           child: TextField(
                             enabled: false,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w300),
                             controller: _dateEditingController,
                           ),
                         ),
-                        Padding(padding: EdgeInsets.only(left: 10)),
+                        const Padding(padding: EdgeInsets.only(left: 10)),
                         RaisedButton(
                           splashColor: Colors.greenAccent,
-                          child: Icon(Icons.wysiwyg),
+                          child: const Icon(Icons.wysiwyg),
                           onPressed: () {
                             showDatePicker(
                               context: context,
@@ -369,7 +398,7 @@ class _addStaff extends State<AddStaff> {
                               if (value != null) {
                                 DateTime _fromDate = DateTime.now();
                                 _fromDate = value;
-                                this._birth = _fromDate;
+                                _birth = _fromDate;
                               }
                             });
                           },
@@ -377,12 +406,12 @@ class _addStaff extends State<AddStaff> {
                       ],
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                   Container(
-                    padding: EdgeInsets.only(left: 15, right: 20),
+                    padding: const EdgeInsets.only(left: 15, right: 20),
                     child: Row(
                       children: [
-                        Text(
+                        const Text(
                           'Giới tính: ',
                           style: TextStyle(color: Colors.white),
                         ),
@@ -393,10 +422,10 @@ class _addStaff extends State<AddStaff> {
                                   value: 0,
                                   groupValue: _gender,
                                   onChanged: (int? value) {
-                                    setState(() => this._gender =
-                                        int.parse(value.toString()));
+                                    setState(() =>
+                                        _gender = int.parse(value.toString()));
                                   }),
-                              Text(
+                              const Text(
                                 'nam',
                                 style: TextStyle(color: Colors.white),
                               ),
@@ -410,10 +439,10 @@ class _addStaff extends State<AddStaff> {
                                   value: 1,
                                   groupValue: _gender,
                                   onChanged: (int? value) {
-                                    setState(() => this._gender =
-                                        int.parse(value.toString()));
+                                    setState(() =>
+                                        _gender = int.parse(value.toString()));
                                   }),
-                              Text(
+                              const Text(
                                 'nữ',
                                 style: TextStyle(color: Colors.white),
                               ),
@@ -423,7 +452,7 @@ class _addStaff extends State<AddStaff> {
                       ],
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                   ListTile(
                     title: const Text(
                       'Chức vụ:',
@@ -443,34 +472,34 @@ class _addStaff extends State<AddStaff> {
                           value: value,
                           child: Text(
                             value,
-                            style: TextStyle(color: Colors.blue),
+                            style: const TextStyle(color: Colors.blue),
                           ),
                         );
                       }).toList(),
                     ),
                   ),
-                  Padding(padding: EdgeInsets.only(bottom: 10)),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
                 ],
               ),
             ),
           ),
           bottomNavigationBar: Container(
             color: kSupColor,
-            padding: EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.only(bottom: 10),
             child: MaterialButton(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(40)),
               ),
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               height: 50,
               color: kSuccessColor,
               minWidth: double.infinity,
               onPressed: () {
-                controller.updateStaff( staff!.id,
-                    _name, _gender, _birth, _role, () {
+                controller.updateStaff(staff!.id, _name, _gender, _birth, _role,
+                    () {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: FlashMessageScreen(
                           type: "Thông báo",
                           content: "Cập nhật thành công!",
@@ -495,9 +524,9 @@ class _addStaff extends State<AddStaff> {
                   );
                 });
               },
-              child: Text(
+              child: const Text(
                 'Cập nhật',
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ));

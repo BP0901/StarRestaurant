@@ -10,10 +10,11 @@ class LoginController {
       Function(String msg) onSignInError) async {
     email = email + "@gmail.com";
     bool checkLogin = await _firAuth.signIn(email, pass, onSignInError);
-    if(checkLogin){
-     String userId = FirebaseAuth.instance.currentUser!.uid;
-     NhanVien nhanVien = await _nhanVienDAO.getNhanVienById(userId);
-     onSuccess(nhanVien.role);
+    if (checkLogin) {
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      NhanVien nhanVien =
+          await _nhanVienDAO.getNhanVienById(userId, onSignInError);
+      onSuccess(nhanVien.role);
     }
   }
 }

@@ -10,13 +10,12 @@ import '../StaffScreen/AddStaffActivity.dart';
 
 Widget buildStaffItem(BuildContext context, int index,
     DocumentSnapshot? document, String? value) {
-  ManagerController controller = ManagerController();
   String _role = document?.get('role');
   String _name = document?.get('name');
   bool _locker = document?.get('disable');
   int _gender = document?.get('gender');
   Timestamp _date = document?.get('birth');
-  var formatBirth = new DateFormat('d-MM-y');
+  var formatBirth = DateFormat('d-MM-y');
   DateTime _birth = _date.toDate();
   String _username = document?.get('username');
   // document.get('name').toString().toLowerCase().contains(value!)
@@ -39,17 +38,17 @@ Widget buildStaffItem(BuildContext context, int index,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(10),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(padding: EdgeInsets.only(top: 10)),
                     Row(
                       children: [
-                        Text(
+                        const Text(
                           'Nhân viên: ',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -67,12 +66,12 @@ Widget buildStaffItem(BuildContext context, int index,
                     ),
                     // ${(document.get('gender')) == '1' ? 'Nam' : 'Nữ'}
                     Text('Gender: ${_gender == 0 ? 'Nam' : 'Nữ'}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
+                        style: const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Birth: ${formatBirth.format(_birth)}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
+                        style: const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Role: ${_role}',
-                        style: TextStyle(fontSize: 18, color: Colors.white)),
-                    Padding(padding: EdgeInsets.only(bottom: 10)),
+                        style: const TextStyle(fontSize: 18, color: Colors.white)),
+                    const Padding(padding: EdgeInsets.only(bottom: 10)),
                   ],
                 ),
                 Expanded(
@@ -81,14 +80,14 @@ Widget buildStaffItem(BuildContext context, int index,
                   children: <Widget>[
                     Container(
                       padding: const EdgeInsets.all(10.0),
-                      child: Text('Locker',
+                      child: const Text('Locker',
                           style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.lock_open,
                       color: kSuccessColor,
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.only(right: 10),
                     )
                   ],
@@ -211,7 +210,7 @@ void _infoStaff(
                 children: [
                   Text(
                     '${name}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -219,7 +218,7 @@ void _infoStaff(
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'ID Cá nhân: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -227,7 +226,7 @@ void _infoStaff(
                       ),
                       Text(
                         '${id}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.blue,
                         ),
                       ),
@@ -236,7 +235,7 @@ void _infoStaff(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Ngày sinh: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -250,7 +249,7 @@ void _infoStaff(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Giới tính: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -264,7 +263,7 @@ void _infoStaff(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Chức vụ: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -278,7 +277,7 @@ void _infoStaff(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Tài khoản cá nhân: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -292,7 +291,7 @@ void _infoStaff(
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Trạng thái tài khoản: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -315,7 +314,7 @@ void _infoStaff(
                                   staff: document,
                                 ));
                               },
-                              child: Text(
+                              child: const Text(
                                 "Sửa thông tin",
                                 style: TextStyle(
                                   color: Colors.white,
@@ -324,13 +323,13 @@ void _infoStaff(
                               color: const Color(0xFF1BC0C5),
                             ),
                           ),
-                          Padding(padding: EdgeInsets.only(left: 10)),
+                          const Padding(padding: EdgeInsets.only(left: 10)),
                           Expanded(
                             child: RaisedButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
+                              child: const Text(
                                 "Hủy",
                                 style: TextStyle(
                                   color: Colors.white,
@@ -369,7 +368,7 @@ void _deleteStaff(BuildContext context, String name, String id) {
       if (value == 'OK') {
         controller.deleteStaff(id, () {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: FlashMessageScreen(
                   type: "Thông báo",
                   content: "Xóa thành công!",

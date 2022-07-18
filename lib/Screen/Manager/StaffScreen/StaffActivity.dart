@@ -21,30 +21,25 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
   bool _isFinding = false;
   ManagerController controller = ManagerController();
   String _findingValue = "";
-  final TextEditingController _findStaffController = TextEditingController();
-  Stream<QuerySnapshot> _staffCateStream =
+  final Stream<QuerySnapshot> _staffCateStream =
       FirebaseFirestore.instance.collection('NhanVien').snapshots();
-  int _cateIndex = -1;
-  chooseCategory(chooseIndex) {
-    _cateIndex = chooseIndex;
-  }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     //In this lesson, we need to add AppBar and more "Add" button
     //This must be Scaffold!. not MaterialApp !
     return Scaffold(
-      drawer: DrawerMGTM(),
+      drawer: const DrawerMGTM(),
       appBar: AppBar(
         backgroundColor: kAppBarColor,
         title: const Text('Quản lý nhân viên'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AddStaff(
+                  builder: (context) => const AddStaff(
                         staff: null,
                       ) //you can send parameters using constructor
                   ));
@@ -71,12 +66,12 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
 
   Widget _findStaff() {
     return Padding(
-      padding: EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
+      padding: const EdgeInsets.only(right: 10, bottom: 20, left: 10, top: 10),
       child: TextField(
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         controller: _findController,
         onChanged:(String value) => onchangeFindVlaue(value),
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
             focusColor: kPrimaryColor,
             prefixIcon: Icon(
               Icons.search,
