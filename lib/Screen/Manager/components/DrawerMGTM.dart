@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:star_restaurant/Screen/Manager/CategoriesScreen/CategoriesActivity.dart';
 import 'package:star_restaurant/Util/Constants.dart';
 import '../StaffScreen/StaffActivity.dart';
 import '../MenuScreen/MenuActivity.dart';
@@ -58,10 +59,30 @@ class DrawerMGTM extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(kDefaultPadding / 4),
                 child: Container(
+                  color: _choosen == 4 ? kSecondaryColor : kSupColor,
+                  child: ListTile(
+                    title: const Text(
+                      'Quản lý loại món ăn',
+                      textScaleFactor: 1.25,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      drawerStateFull(
+                        () => _choosen = 4,
+                      );
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const CategoriesActivity()));
+                    },
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(kDefaultPadding / 4),
+                child: Container(
                   color: _choosen == 2 ? kSecondaryColor : kSupColor,
                   child: ListTile(
                     title: const Text(
-                      'Quản lý menu',
+                      'Quản lý món ăn',
                       textScaleFactor: 1.25,
                       style: TextStyle(color: Colors.white),
                     ),

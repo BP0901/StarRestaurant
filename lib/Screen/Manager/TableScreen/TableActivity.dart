@@ -190,7 +190,7 @@ class _TablePage extends State<TablePage> {
             )
           ],
         ),
-        drawer: DrawerMGTM(),
+        drawer: const DrawerMGTM(),
         body: SafeArea(
           child: Material(
             child: Container(
