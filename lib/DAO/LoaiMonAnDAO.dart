@@ -42,4 +42,13 @@ class LoaiMonAnDAO {
       .update({'name': loaiMonAn.name, 'image': loaiMonAn.image})
       .then((value) => Fluttertoast.showToast(msg: "Xóa thành công"))
       .catchError((onError) => Fluttertoast.showToast(msg: onError.toString()));
+
+  Future<LoaiMonAn> getLoaiMAbyID(String type) async {
+    LoaiMonAn loaiMonAn = LoaiMonAn.origin();
+    await _ref
+        .doc(type)
+        .get()
+        .then((value) => loaiMonAn = LoaiMonAn.fromDocument(value));
+    return loaiMonAn;
+  }
 }

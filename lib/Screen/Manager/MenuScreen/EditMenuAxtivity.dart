@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:star_restaurant/Controller/LoaiMonAnController.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
 import '../../../Components/flash_message.dart';
 import '../../../Model/LoaiMonAn.dart';
@@ -33,10 +34,10 @@ class _editMenu extends State<EditMenu> {
   final _priceEditingController = TextEditingController();
   final _discountEditingController = TextEditingController();
   final _unitEditingController = TextEditingController();
-  String _type = 'hap';
+  String _type = 'Hấp';
   String _name = '';
   int _price = 0;
-  String _unit = 'chai';
+  String _unit = '';
   String _fid = '';
   int _discount = 0;
   @override
@@ -47,14 +48,11 @@ class _editMenu extends State<EditMenu> {
     if (food != null) {
       _fid = food!.id;
       _name = food?.get('name');
-      _type = food?.get('type');
       _price = food?.get('price');
       _unit = food?.get('unit');
       _discount = food?.get('discount');
       imageUrl = food?.get('image');
       _nameEditingController.text = _name;
-      // _priceEditingController.text = _username;
-      // _dateEditingController.text=DateFormat.yMd().format(this._birth);
     }
   }
 
@@ -276,6 +274,9 @@ class _editMenu extends State<EditMenu> {
             ),
           ));
     } else {
+      _unitEditingController.text = _unit.toString();
+      _priceEditingController.text = _price.toString();
+      _discountEditingController.text = _discount.toString();
       return Scaffold(
           appBar: AppBar(
             backgroundColor: kAppBarColor,
@@ -429,34 +430,9 @@ class _editMenu extends State<EditMenu> {
               color: kSuccessColor,
               minWidth: double.infinity,
               onPressed: () {
-                controller.updateFood(
-                    _fid, _name, imageUrl, _price, _discount, _type, _unit, () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: FlashMessageScreen(
-                          type: "Thông báo",
-                          content: "Cập nhật thành công!",
-                          color: Colors.green),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                  );
-                }, (msg) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: FlashMessageScreen(
-                          type: "Thông báo",
-                          content: msg,
-                          color: kPrimaryColor),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                  );
-                });
+                MonAn monAn = MonAn(
+                    _fid, _name, imageUrl, _price, _unit, _discount, _type);
+                controller.updateFood(monAn);
               },
               child: const Text(
                 'Cập nhật',

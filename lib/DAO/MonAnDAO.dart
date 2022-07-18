@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
 
 class MonAnDAO {
@@ -67,30 +68,20 @@ class MonAnDAO {
     }).whenComplete(() => {print("completed")});
   }
 
-  Future update(
-      String id,
-      String name,
-      String image,
-      int price,
-      int discount,
-      String type,
-      String unit,
-      Function onSuccess,
-      Function(String) onfailure) {
+  Future update(MonAn monAn) {
     return conllectionMonAn
-        .doc(id)
+        .doc(monAn.id)
         .set({
-          'name': name,
-          'image': image,
-          'price': price,
-          'discount': discount,
-          'type': type
+          'name': monAn.name,
+          'image': monAn.image,
+          'price': monAn.price,
+          'discount': monAn.discount,
+          'type': monAn.type,
+          'unit': monAn.unit
         })
-        .then((value) {})
-        .catchError((onError) {
-          print("err: " + onError.toString());
-          onError("Thêm mới không thành công");
-        })
+        .then((value) => Fluttertoast.showToast(msg: "Cập Nhật thành công"))
+        .catchError(
+            (onError) => Fluttertoast.showToast(msg: onError.toString()))
         .whenComplete(() => {print("completed")});
   }
 

@@ -16,9 +16,7 @@ class ManagerController {
   LoaiMonAnDAO loaiMonAnDAO = LoaiMonAnDAO();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   void addStaff(
-      NhanVien nhanVien,
-      Function onSuccess,
-      Function(String) onfailure) async {
+      NhanVien nhanVien, Function onSuccess, Function(String) onfailure) async {
     try {
       nhanVienDAO.createStaff(nhanVien, onSuccess, onfailure);
     } catch (e) {}
@@ -62,18 +60,10 @@ class ManagerController {
     } catch (e) {}
   }
 
-  void updateFood(
-      String id,
-      String name,
-      String image,
-      int price,
-      int discount,
-      String type,
-      String unit,
-      Function onSuccess,
-      Function(String) onfailure) async {
-    monAnDAO.update(
-        id, name, image, price, discount, type, unit, onSuccess, onfailure);
+  void updateFood(MonAn monAn) async {
+    LoaiMonAn loaiMonAn = await loaiMonAnDAO.getLoaiMonAnByID(monAn.type);
+    monAn.type = loaiMonAn.id;
+    monAnDAO.update(monAn);
   }
 
   Future<List<LoaiMonAn>> getListCates() async => loaiMonAnDAO.getLisstCates();

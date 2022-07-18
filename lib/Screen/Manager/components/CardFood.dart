@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/ManagerController.dart';
+import 'package:star_restaurant/Screen/Manager/MenuScreen/EditMenuAxtivity.dart';
 import 'package:star_restaurant/Util/Constants.dart';
 
 Widget buildFoodItem(BuildContext context, int index,
@@ -9,12 +11,8 @@ Widget buildFoodItem(BuildContext context, int index,
   if (value == null) {
     if (document != null) {
       return GestureDetector(
-        onLongPress: () {
-          _deleteFood(context, document);
-        },
-        onTap: () {
-          _infoFood(context, document);
-        },
+        onLongPress: () => _deleteFood(context, document),
+        onDoubleTap: () => Get.to(EditMenu(food: document)),
         child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
