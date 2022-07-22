@@ -1,15 +1,13 @@
 import 'dart:io';
 
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:star_restaurant/Controller/LoaiMonAnController.dart';
+import 'package:star_restaurant/Bloc/FoodBloc.dart';
 import 'package:star_restaurant/Model/MonAn.dart';
-import '../../../Components/flash_message.dart';
 import '../../../Model/LoaiMonAn.dart';
 import '../../../Util/Constants.dart';
 import '../../../Controller/ManagerController.dart';
@@ -22,7 +20,7 @@ class EditMenu extends StatefulWidget {
 }
 
 class _editMenu extends State<EditMenu> {
-  bool isLoading = false;
+  final FoodBloc _foodBloc = FoodBloc();
   String imageName = "";
   String imageUrl = "";
   DocumentSnapshot? food;
@@ -42,6 +40,7 @@ class _editMenu extends State<EditMenu> {
   int _discount = 0;
   @override
   void initState() {
+    _type = 'Hấp';
     super.initState();
     listCates = controller.getListCates();
     food = widget.food;
@@ -65,166 +64,183 @@ class _editMenu extends State<EditMenu> {
             title: const Text('Quản lý thực đơn'),
           ),
           key: _scaffoldKey,
-          body: isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.transparent,
-                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+          body: SafeArea(
+            child: Container(
+              color: kSupColor,
+              padding: const EdgeInsets.only(
+                  right: 10, bottom: 20, left: 10, top: 10),
+              child: Column(
+                children: [
+                  const Text(
+                    'THÊM MÓN ĂN',
+                    style: TextStyle(
+                        color: kSuccessColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 26),
                   ),
-                )
-              : SafeArea(
-                  child: Container(
-                    color: kSupColor,
-                    padding: const EdgeInsets.only(
-                        right: 10, bottom: 20, left: 10, top: 10),
-                    child: Column(
-                      children: [
-                        const Text(
-                          'THÊM MÓN ĂN',
-                          style: TextStyle(
-                              color: kSuccessColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 26),
-                        ),
-                        const Padding(padding: EdgeInsets.only(bottom: 20)),
-                        TextField(
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
+                  StreamBuilder(
+                      stream: _foodBloc.nameStream,
+                      builder: (context, snapshot) {
+                        return TextField(
                           style: const TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w300),
                           controller: _nameEditingController,
-                          onChanged: (text) {
-                            setState(() {
-                              _name =
-                                  text; //when state changed => build() rerun => reload widget
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               ),
                             ),
                             labelText: 'Tên món ăn',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                           ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(bottom: 20)),
-                        TextField(
+                        );
+                      }),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
+                  StreamBuilder(
+                      stream: _foodBloc.priceStream,
+                      builder: (context, snapshot) {
+                        return TextField(
                           style: const TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w300),
                           controller: _priceEditingController,
-                          onChanged: (text) => setState(() {
-                            _price = int.parse(
-                                text); //when state changed => build() rerun => reload widget
-                          }),
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               ),
                             ),
                             labelText: 'Giá tiền',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                           ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(bottom: 20)),
-                        TextField(
+                        );
+                      }),
+                  const Padding(padding: EdgeInsets.only(bottom: 20)),
+                  StreamBuilder(
+                      stream: _foodBloc.discountStream,
+                      builder: (context, snapshot) {
+                        return TextField(
                           style: const TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w300),
                           controller: _discountEditingController,
-                          onChanged: (text) => setState(() {
-                            _discount = int.parse(
-                                text); //when state changed => build() rerun => reload widget
-                          }),
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               ),
                             ),
                             labelText: 'Giá sau giảm',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                           ),
-                        ),
-                        const Padding(padding: EdgeInsets.only(bottom: 10)),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Loại món ăn:',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              Text(
-                                _type,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              FutureBuilder<List<LoaiMonAn>>(
-                                  future: listCates,
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      _type = snapshot.data![0].name;
-                                      return DropdownButton(
-                                        value: _type,
-                                        onChanged: (value) => setState(
-                                            () => _type = value.toString()),
-                                        items: snapshot.data!
-                                            .map((cate) =>
-                                                DropdownMenuItem<String>(
-                                                  child: Text(cate.name),
-                                                  value: cate.name,
-                                                ))
-                                            .toList(),
-                                      );
-                                    }
-                                    return const SizedBox.shrink();
-                                  }),
-                            ],
-                          ),
-                        ),
-                        TextField(
+                        );
+                      }),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
+                  StreamBuilder(
+                      stream: _foodBloc.unitStream,
+                      builder: (context, snapshot) {
+                        return TextField(
                           style: const TextStyle(
                               color: Colors.white, fontWeight: FontWeight.w300),
                           controller: _unitEditingController,
-                          onChanged: (unit) => setState(() => _unit = unit),
                           keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10),
                               ),
                             ),
                             labelText: 'Đơn vị tính:',
-                            labelStyle: TextStyle(color: Colors.white),
+                            labelStyle: const TextStyle(color: Colors.white),
                           ),
+                        );
+                      }),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Loại món ăn:',
+                          style: TextStyle(color: Colors.white),
                         ),
-                        const Padding(padding: EdgeInsets.only(bottom: 10)),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Hình ảnh: ",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Text(
-                              imageName,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            IconButton(
-                              onPressed: getImage,
-                              icon: const FaIcon(
-                                FontAwesomeIcons.image,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        )
+                        StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection("LoaiMonAn")
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        kPrimaryColor),
+                                  ),
+                                );
+                              } else {
+                                List<String> list = [];
+                                snapshot.data!.docs.forEach(
+                                    (element) => list.add(element.get('name')));
+                                return DropdownButton(
+                                  style: const TextStyle(color: Colors.white),
+                                  dropdownColor: kSecondaryColor,
+                                  value: _type,
+                                  onChanged: (value) =>
+                                      setState(() => _type = value.toString()),
+                                  items: list
+                                      .map((cate) => DropdownMenuItem<String>(
+                                            child: Text(cate),
+                                            value: cate,
+                                          ))
+                                      .toList(),
+                                );
+                              }
+                            }),
                       ],
                     ),
                   ),
-                ),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Hình ảnh: ",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Text(
+                          imageName,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        IconButton(
+                          onPressed: getImage,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.image,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
           bottomNavigationBar: Container(
             color: kSupColor,
             padding: const EdgeInsets.only(bottom: 10),
@@ -236,37 +252,7 @@ class _editMenu extends State<EditMenu> {
               height: 50,
               color: kPrimaryColor,
               minWidth: double.infinity,
-              onPressed: () {
-                MonAn monAn =
-                    MonAn("", _name, imageUrl, _price, _unit, _discount, _type);
-                controller.addFood(monAn, () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: FlashMessageScreen(
-                          type: "Thông báo",
-                          content: "Cập nhật thành công!",
-                          color: Colors.green),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                  );
-                }, (msg) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: FlashMessageScreen(
-                          type: "Thông báo",
-                          content: msg,
-                          color: kPrimaryColor),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                  );
-                });
-              },
+              onPressed: () => addFood(),
               child: const Text(
                 'Thêm mới',
                 style: TextStyle(color: Colors.white),
@@ -368,15 +354,10 @@ class _editMenu extends State<EditMenu> {
                           'Loại món ăn:',
                           style: TextStyle(color: Colors.white),
                         ),
-                        Text(
-                          _type,
-                          style: const TextStyle(color: Colors.white),
-                        ),
                         FutureBuilder<List<LoaiMonAn>>(
                             future: listCates,
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                _type = snapshot.data![0].name;
                                 return DropdownButton(
                                   value: _type,
                                   onChanged: (value) =>
@@ -452,36 +433,31 @@ class _editMenu extends State<EditMenu> {
       pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         imageFile = File(pickedFile.path);
-
-        if (imageFile != null) {
-          setState(() {
-            isLoading = true;
-          });
-          uploadFile();
-        }
+        String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+        setState(() {
+          imageName = fileName;
+        });
       }
     } else {
       await Permission.storage.request();
     }
   }
 
-  Future uploadFile() async {
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference reference = FirebaseStorage.instance.ref().child(fileName);
-    UploadTask uploadTask = reference.putFile(imageFile!);
-
-    try {
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
-      setState(() {
-        imageName = fileName;
-        isLoading = false;
-      });
-    } on FirebaseException catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: e.message ?? e.toString());
+  addFood() {
+    String discount = _discountEditingController.text.trim();
+    String name = _nameEditingController.text.trim();
+    String price = _priceEditingController.text.trim();
+    String unit = _unitEditingController.text.trim();
+    var isValid = _foodBloc.isAddOrEditFoodValid(discount, name, price, unit);
+    if (isValid) {
+      if (imageName == "") {
+        Fluttertoast.showToast(msg: "Chọn hình ảnh cho món ăn");
+        return;
+      }
+      MonAn monAn = MonAn(
+          "", name, "", int.parse(price), unit, int.parse(discount), _type);
+      controller.addFood(monAn, imageFile, imageName);
+      Navigator.pop(context);
     }
   }
 }

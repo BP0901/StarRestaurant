@@ -6,8 +6,6 @@ class HoaDonDAO {
   final _refBanAn = FirebaseFirestore.instance.collection("BanAn");
   final _refMonAnDaGoi =
       FirebaseFirestore.instance.collection("MonAnDaXacNhan");
-  final _refChiTietHoaDon =
-      FirebaseFirestore.instance.collection("ChiTietHoaDon ");
   final User? _user = FirebaseAuth.instance.currentUser;
 
   void confirmPayTheBill(

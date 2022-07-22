@@ -1,18 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:star_restaurant/Components/primary_button.dart';
 import 'package:star_restaurant/Components/loading_daialog.dart';
 import 'package:star_restaurant/Components/msg_dialog.dart';
-import 'package:star_restaurant/Controller/MessagingController.dart';
 import 'package:star_restaurant/Screen/Cashier/CashierActivity.dart';
 import 'package:star_restaurant/Screen/Chef/ChefActiviy.dart';
 import 'package:star_restaurant/Screen/Manager/ManagerActivity.dart';
 import 'package:star_restaurant/Screen/Waiter/WaiterActivity.dart';
 import 'package:star_restaurant/Util/constants.dart';
-import 'package:star_restaurant/Screen/Login/Validation/validInput.dart';
+import 'package:star_restaurant/Bloc/LoginBloc.dart';
 
 class LoginActivity extends StatefulWidget {
   const LoginActivity({Key? key}) : super(key: key);
@@ -23,7 +20,6 @@ class LoginActivity extends StatefulWidget {
 
 class _LoginActivityState extends State<LoginActivity> {
   AuthBloc authBloc = AuthBloc();
-  final MessagingController _messagingController = MessagingController();
   bool _passStatetus = true;
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -34,26 +30,26 @@ class _LoginActivityState extends State<LoginActivity> {
   }
 
   void _signInAnAccount() async {
-    String email = _usernameController.text;
-    String pass = _passwordController.text;
+    String email = _usernameController.text.trim();
+    String pass = _passwordController.text.trim();
     var isValid = authBloc.isLoginValid(email, pass);
     if (isValid) {
       LoadingDialog.showLoadingDialog(context, "Loading...");
       authBloc.signIn(email, pass, (role) async {
-          if (role == "manager") {
-            LoadingDialog.hideLoadingDialog(context);
-            Get.to(const ManagerActivity());
-          } else if (role == "waiter") {
-            await FirebaseMessaging.instance.subscribeToTopic("food");
-            LoadingDialog.hideLoadingDialog(context);
-            Get.to(const WaiterActivity());
-          } else if (role == "cashier") {
-            LoadingDialog.hideLoadingDialog(context);
-            Get.to(const CashierActivity());
-          } else if (role == "chef") {
-            LoadingDialog.hideLoadingDialog(context);
-            Get.to(const ChefActivity());
-          }
+        if (role == "manager") {
+          LoadingDialog.hideLoadingDialog(context);
+          Get.to(const ManagerActivity());
+        } else if (role == "waiter") {
+          await FirebaseMessaging.instance.subscribeToTopic("food");
+          LoadingDialog.hideLoadingDialog(context);
+          Get.to(const WaiterActivity());
+        } else if (role == "cashier") {
+          LoadingDialog.hideLoadingDialog(context);
+          Get.to(const CashierActivity());
+        } else if (role == "chef") {
+          LoadingDialog.hideLoadingDialog(context);
+          Get.to(const ChefActivity());
+        }
       }, (msg) {
         LoadingDialog.hideLoadingDialog(context);
         MsgDialog.showMsgDialog(context, "Sign-In", msg);

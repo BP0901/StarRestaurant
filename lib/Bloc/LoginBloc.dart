@@ -37,6 +37,4 @@ class AuthBloc {
     _usernameController.close();
     _passController.close();
   }
-
-  
 }

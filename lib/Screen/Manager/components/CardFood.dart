@@ -12,6 +12,7 @@ Widget buildFoodItem(BuildContext context, int index,
     if (document != null) {
       return GestureDetector(
         onLongPress: () => _deleteFood(context, document),
+        onTap: () => _infoFood(context, document),
         onDoubleTap: () => Get.to(EditMenu(food: document)),
         child: Card(
             shape:

@@ -49,7 +49,7 @@ class MonAnDAO {
         });
   }
 
-  Future add(MonAn monAn, Function onSuccess, Function(String) onfailure) {
+  Future add(MonAn monAn) {
     return conllectionMonAn.add({
       'name': monAn.name,
       'image': monAn.image,
@@ -61,10 +61,10 @@ class MonAnDAO {
       conllectionMonAn
           .doc(value.id)
           .set({"id": value.id}, SetOptions(merge: true));
-      onSuccess();
+      Fluttertoast.showToast(msg: "Thêm thành công!");
     }).catchError((onError) {
       print("err: " + onError.toString());
-      onError("Thêm mới không thành công");
+      Fluttertoast.showToast(msg: "Thêm thất bại!");
     }).whenComplete(() => {print("completed")});
   }
 
