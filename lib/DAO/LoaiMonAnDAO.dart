@@ -40,7 +40,7 @@ class LoaiMonAnDAO {
   update(LoaiMonAn loaiMonAn) => _ref
       .doc(loaiMonAn.id)
       .update({'name': loaiMonAn.name, 'image': loaiMonAn.image})
-      .then((value) => Fluttertoast.showToast(msg: "Xóa thành công"))
+      .then((value) => Fluttertoast.showToast(msg: "Cập nhật thành công"))
       .catchError((onError) => Fluttertoast.showToast(msg: onError.toString()));
 
   Future<LoaiMonAn> getLoaiMAbyID(String type) async {

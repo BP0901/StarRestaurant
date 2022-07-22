@@ -122,7 +122,6 @@ class _CategoriesActivityState extends State<CategoriesActivity> {
 
   void _onButtonShowModalSheet(LoaiMonAn loaiMonAn, bool isEdit) {
     var _contentController = TextEditingController();
-    bool isLoading = false;
     File? imageFile;
     String imageUrl = isEdit ? loaiMonAn.image : "";
     String imageName = "";
@@ -134,107 +133,70 @@ class _CategoriesActivityState extends State<CategoriesActivity> {
             builder: (context, setDialogState) => AlertDialog(
                   backgroundColor: kSupColor,
                   scrollable: true,
-                  content: isLoading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.transparent,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                  content: SizedBox(
+                    height: 150,
+                    child: Column(children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        child: TextField(
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelText: 'Tên',
+                            labelStyle: TextStyle(color: Colors.white),
+                            focusColor: Colors.white,
                           ),
-                        )
-                      : SizedBox(
-                          height: 150,
-                          child: Column(children: <Widget>[
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              child: TextField(
-                                style: const TextStyle(color: Colors.white),
-                                decoration: const InputDecoration(
-                                  labelText: 'Tên',
-                                  labelStyle: TextStyle(color: Colors.white),
-                                  focusColor: Colors.white,
-                                ),
-                                controller: _contentController,
-                              ),
-                            ),
-                            Container(
-                              padding:
-                                  const EdgeInsets.only(left: 15, right: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Hình ảnh: ",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    imageName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  IconButton(
-                                      onPressed: () async {
-                                        ImagePicker imagePicker = ImagePicker();
-                                        PickedFile? pickedFile;
-                                        var status =
-                                            await Permission.storage.status;
-                                        if (status.isGranted) {
-                                          // ignore: deprecated_member_use
-                                          pickedFile =
-                                              await imagePicker.getImage(
-                                                  source: ImageSource.gallery);
-                                          if (pickedFile != null) {
-                                            imageFile = File(pickedFile.path);
-
-                                            if (imageFile != null) {
-                                              setDialogState(() {
-                                                isLoading = true;
-                                              });
-                                            }
-                                          }
-                                        } else {
-                                          await Permission.storage.request();
-                                        }
-                                        String fileName = DateTime.now()
-                                            .millisecondsSinceEpoch
-                                            .toString();
-                                        Reference reference = FirebaseStorage
-                                            .instance
-                                            .ref()
-                                            .child(fileName);
-                                        UploadTask uploadTask =
-                                            reference.putFile(imageFile!);
-
-                                        try {
-                                          TaskSnapshot snapshot =
-                                              await uploadTask;
-                                          imageUrl = await snapshot.ref
-                                              .getDownloadURL();
-                                          setDialogState(() {
-                                            imageName = fileName;
-                                            isLoading = false;
-                                          });
-                                        } on FirebaseException catch (e) {
-                                          setDialogState(() {
-                                            isLoading = false;
-                                          });
-                                          Fluttertoast.showToast(
-                                              msg: e.message ?? e.toString());
-                                        }
-                                      },
-                                      icon: const FaIcon(
-                                        FontAwesomeIcons.image,
-                                        color: Colors.white,
-                                      ))
-                                ],
-                              ),
-                            ),
-                          ]),
+                          controller: _contentController,
                         ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 15, right: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Hình ảnh: ",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              imageName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  ImagePicker imagePicker = ImagePicker();
+                                  PickedFile? pickedFile;
+                                  var status = await Permission.storage.status;
+                                  if (status.isGranted) {
+                                    // ignore: deprecated_member_use
+                                    pickedFile = await imagePicker.getImage(
+                                        source: ImageSource.gallery);
+                                    if (pickedFile != null) {
+                                      imageFile = File(pickedFile.path);
+                                    }
+                                  } else {
+                                    await Permission.storage.request();
+                                  }
+                                  String fileName = DateTime.now()
+                                      .millisecondsSinceEpoch
+                                      .toString();
+
+                                  setDialogState(() {
+                                    imageName = fileName;
+                                  });
+                                },
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.image,
+                                  color: Colors.white,
+                                ))
+                          ],
+                        ),
+                      ),
+                    ]),
+                  ),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(context, 'Hủy'),
@@ -246,17 +208,31 @@ class _CategoriesActivityState extends State<CategoriesActivity> {
                     TextButton(
                       onPressed: isEdit
                           ? () {
-                              loaiMonAn.name = _contentController.text;
-                              loaiMonAn.image = imageUrl;
-                              _loaiMonAnConroller.updateLoaiMA(loaiMonAn);
+                              String name = _contentController.text.trim();
+                              if (name.isEmpty || name == "") {
+                                Fluttertoast.showToast(
+                                    msg: "Nhập tên loại món ăn");
+                                return;
+                              }
+                              loaiMonAn.name = _contentController.text.trim();
+                              _loaiMonAnConroller.updateLoaiMA(loaiMonAn, imageFile, imageName);
                               Navigator.pop(context);
                             }
                           : () {
+                              String name = _contentController.text.trim();
+                              if (name.isEmpty || name == "") {
+                                Fluttertoast.showToast(
+                                    msg: "Nhập tên loại món ăn");
+                                return;
+                              }
+                              if (imageName.isEmpty || imageName == "") {
+                                Fluttertoast.showToast(msg: "Chọn hình ảnh");
+                                return;
+                              }
                               LoaiMonAn loaiMA = LoaiMonAn(
-                                  id: "",
-                                  name: _contentController.text,
-                                  image: imageUrl);
-                              _loaiMonAnConroller.addLoaiMonAn(loaiMA);
+                                  id: "", name: name, image: imageUrl);
+                              _loaiMonAnConroller.addLoaiMonAn(
+                                  loaiMA, imageFile, imageName);
                               Navigator.pop(context);
                             },
                       child: Text(

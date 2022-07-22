@@ -1,10 +1,6 @@
 import 'dart:async';
 
-import 'package:star_restaurant/Controller/ManagerController.dart';
-
 class FoodBloc {
-  final ManagerController _managerController = ManagerController();
-
   final StreamController _discountController = StreamController();
   final StreamController _nameController = StreamController();
   final StreamController _priceController = StreamController();

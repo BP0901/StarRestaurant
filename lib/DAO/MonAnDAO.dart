@@ -93,4 +93,13 @@ class MonAnDAO {
       onError("Thêm mới không thành công");
     }).whenComplete(() => {print("completed")});
   }
+
+  Future<int> checkSizeFoodByCate(String idCate) async {
+    int size = 0;
+    await conllectionMonAn
+        .where("type", isEqualTo: idCate)
+        .get()
+        .then((value) => size = value.size);
+    return size;
+  }
 }
