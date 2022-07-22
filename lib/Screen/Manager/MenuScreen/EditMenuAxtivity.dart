@@ -279,71 +279,102 @@ class _editMenu extends State<EditMenu> {
                   const Text(
                     'CHỈNH SỬA MÓN ĂN',
                     style: TextStyle(
-                        color: kSuccessColor,
+                        color: kPrimaryColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 26),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 20)),
-                  TextField(
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w300),
-                    controller: _nameEditingController,
-                    onChanged: (text) {
-                      setState(() {
-                        _name =
-                            text; //when state changed => build() rerun => reload widget
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                      ),
-                      labelText: 'Tên món ăn',
-                      labelStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: _foodBloc.nameStream,
+                      builder: (context, snapshot) {
+                        return TextField(
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w300),
+                          controller: _nameEditingController,
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            labelText: 'Tên món ăn',
+                            labelStyle: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }),
                   const Padding(padding: EdgeInsets.only(bottom: 20)),
-                  TextField(
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w300),
-                    controller: _priceEditingController,
-                    onChanged: (text) => setState(() {
-                      _price = int.parse(
-                          text); //when state changed => build() rerun => reload widget
-                    }),
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                      ),
-                      labelText: 'Giá tiền',
-                      labelStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: _foodBloc.priceStream,
+                      builder: (context, snapshot) {
+                        return TextField(
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w300),
+                          controller: _priceEditingController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            labelText: 'Giá tiền',
+                            labelStyle: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }),
                   const Padding(padding: EdgeInsets.only(bottom: 20)),
-                  TextField(
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w300),
-                    controller: _discountEditingController,
-                    onChanged: (text) => setState(() {
-                      _discount = int.parse(
-                          text); //when state changed => build() rerun => reload widget
-                    }),
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                      ),
-                      labelText: 'Giá sau giảm',
-                      labelStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  StreamBuilder(
+                      stream: _foodBloc.discountStream,
+                      builder: (context, snapshot) {
+                        return TextField(
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w300),
+                          controller: _discountEditingController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            labelText: 'Giá sau giảm',
+                            labelStyle: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }),
+                  const Padding(padding: EdgeInsets.only(bottom: 10)),
+                  StreamBuilder(
+                      stream: _foodBloc.unitStream,
+                      builder: (context, snapshot) {
+                        return TextField(
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w300),
+                          controller: _unitEditingController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            errorText: snapshot.hasError
+                                ? snapshot.error.toString()
+                                : null,
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                            ),
+                            labelText: 'Đơn vị tính:',
+                            labelStyle: const TextStyle(
+                                color: Color.fromARGB(255, 54, 47, 47)),
+                          ),
+                        );
+                      }),
                   const Padding(padding: EdgeInsets.only(bottom: 10)),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
@@ -354,47 +385,64 @@ class _editMenu extends State<EditMenu> {
                           'Loại món ăn:',
                           style: TextStyle(color: Colors.white),
                         ),
-                        FutureBuilder<List<LoaiMonAn>>(
-                            future: listCates,
+                        StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection("LoaiMonAn")
+                                .snapshots(),
                             builder: (context, snapshot) {
-                              if (snapshot.hasData) {
+                              if (!snapshot.hasData) {
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        kPrimaryColor),
+                                  ),
+                                );
+                              } else {
+                                List<String> list = [];
+                                snapshot.data!.docs.forEach(
+                                    (element) => list.add(element.get('name')));
                                 return DropdownButton(
+                                  style: const TextStyle(color: Colors.white),
+                                  dropdownColor: kSecondaryColor,
                                   value: _type,
                                   onChanged: (value) =>
                                       setState(() => _type = value.toString()),
-                                  items: snapshot.data!
+                                  items: list
                                       .map((cate) => DropdownMenuItem<String>(
-                                            child: Text(cate.name),
-                                            value: cate.name,
+                                            child: Text(cate),
+                                            value: cate,
                                           ))
                                       .toList(),
                                 );
                               }
-                              return const SizedBox.shrink();
                             }),
                       ],
                     ),
                   ),
                   const Padding(padding: EdgeInsets.only(bottom: 10)),
-                  TextField(
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w300),
-                    controller: _unitEditingController,
-                    onChanged: (unit) => setState(() {
-                      _unit = unit
-                          .toString(); //when state changed => build() rerun => reload widget
-                    }),
-                    keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(11, 0, 11, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Hình ảnh: ",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      ),
-                      labelText: 'Đơn vị tính:',
-                      labelStyle: TextStyle(color: Colors.white),
+                        Text(
+                          imageName,
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        IconButton(
+                          onPressed: getImage,
+                          icon: const FaIcon(
+                            FontAwesomeIcons.image,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -410,11 +458,7 @@ class _editMenu extends State<EditMenu> {
               height: 50,
               color: kSuccessColor,
               minWidth: double.infinity,
-              onPressed: () {
-                MonAn monAn = MonAn(
-                    _fid, _name, imageUrl, _price, _unit, _discount, _type);
-                controller.updateFood(monAn);
-              },
+              onPressed: () => updateFood(),
               child: const Text(
                 'Cập nhật',
                 style: TextStyle(color: Colors.white),
@@ -440,6 +484,26 @@ class _editMenu extends State<EditMenu> {
       }
     } else {
       await Permission.storage.request();
+    }
+  }
+
+  updateFood() {
+    String discount = _discountEditingController.text.trim();
+    String name = _nameEditingController.text.trim();
+    String price = _priceEditingController.text.trim();
+    String unit = _unitEditingController.text.trim();
+    var isValid = _foodBloc.isAddOrEditFoodValid(discount, name, price, unit);
+    if (isValid) {
+      MonAn monAn;
+      if (imageName == "") {
+        monAn = MonAn(_fid, name, imageUrl, int.parse(price), unit,
+            int.parse(discount), _type);
+      } else {
+        monAn = MonAn(
+            _fid, name, "", int.parse(price), unit, int.parse(discount), _type);
+      }
+      controller.updateFood(monAn, imageFile, imageName);
+      Navigator.pop(context);
     }
   }
 

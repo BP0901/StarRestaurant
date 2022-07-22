@@ -59,14 +59,16 @@ class ManagerController {
     monAn.type = loaiMonAn.id;
     String imageUrl = await imageUpload.uploadFile(imageFile, imageName);
     monAn.image = imageUrl;
-    try {
-      monAnDAO.add(monAn);
-    } catch (e) {}
+    monAnDAO.add(monAn);
   }
 
-  void updateFood(MonAn monAn) async {
+  void updateFood(MonAn monAn, File? imageFile, String imageName) async {
     LoaiMonAn loaiMonAn = await loaiMonAnDAO.getLoaiMonAnByID(monAn.type);
     monAn.type = loaiMonAn.id;
+    if (monAn.image == "") {
+      String imageUrl = await imageUpload.uploadFile(imageFile, imageName);
+      monAn.image = imageUrl;
+    }
     monAnDAO.update(monAn);
   }
 
