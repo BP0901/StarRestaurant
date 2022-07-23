@@ -23,7 +23,7 @@ Widget buildStaffItem(BuildContext context, int index,
     if (document != null) {
       return GestureDetector(
         onLongPress: () {
-          _deleteStaff(context, _name, document.id);
+          _disableStaff(context, _name, document.id);
         },
         onTap: () {
           _infoStaff(context, document.id, _name, _role, _gender, _locker,
@@ -66,11 +66,14 @@ Widget buildStaffItem(BuildContext context, int index,
                     ),
                     // ${(document.get('gender')) == '1' ? 'Nam' : 'Nữ'}
                     Text('Gender: ${_gender == 0 ? 'Nam' : 'Nữ'}',
-                        style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Birth: ${formatBirth.format(_birth)}',
-                        style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                     Text('Role: ${_role}',
-                        style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.white)),
                     const Padding(padding: EdgeInsets.only(bottom: 10)),
                   ],
                 ),
@@ -83,8 +86,8 @@ Widget buildStaffItem(BuildContext context, int index,
                       child: const Text('Locker',
                           style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
-                    const Icon(
-                      Icons.lock_open,
+                    Icon(
+                      _locker ? Icons.lock : Icons.lock_open,
                       color: kSuccessColor,
                     ),
                     const Padding(
@@ -103,7 +106,7 @@ Widget buildStaffItem(BuildContext context, int index,
         document.get('name').toString().toLowerCase().contains(value)) {
       return GestureDetector(
         onLongPress: () {
-          _deleteStaff(context, _name, document.id);
+          _disableStaff(context, _name, document.id);
         },
         onTap: () {
           _infoStaff(context, document.id, _name, _role, _gender, _locker,
@@ -166,8 +169,8 @@ Widget buildStaffItem(BuildContext context, int index,
                       child: const Text('Locker',
                           style: TextStyle(fontSize: 18, color: Colors.white)),
                     ),
-                    const Icon(
-                      Icons.lock_open,
+                    Icon(
+                      _locker ? Icons.lock : Icons.lock_open,
                       color: kSuccessColor,
                     ),
                     const Padding(
@@ -348,13 +351,13 @@ void _infoStaff(
       });
 }
 
-void _deleteStaff(BuildContext context, String name, String id) {
+void _disableStaff(BuildContext context, String name, String id) {
   ManagerController controller = ManagerController();
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Xác nhận xóa'),
-            content: Text('Bạn có muốn xóa ${name}'),
+            title: const Text('Khóa/Mở tài khoản'),
+            content: Text('Bạn có muốn Khóa/Mở tài khoản: ${name}'),
             actions: <Widget>[
               FlatButton(
                   onPressed: () => Navigator.pop(context, 'Cancel'),
@@ -366,12 +369,12 @@ void _deleteStaff(BuildContext context, String name, String id) {
           )).then((value) {
     if (value != null) {
       if (value == 'OK') {
-        controller.deleteStaff(id, () {
+        controller.disableStaff(id, () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: FlashMessageScreen(
                   type: "Thông báo",
-                  content: "Xóa thành công!",
+                  content: "Thành công!",
                   color: Colors.green),
               behavior: SnackBarBehavior.floating,
               backgroundColor: Colors.transparent,

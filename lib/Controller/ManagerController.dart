@@ -18,16 +18,14 @@ class ManagerController {
   MonAnDAO monAnDAO = MonAnDAO();
   LoaiMonAnDAO loaiMonAnDAO = LoaiMonAnDAO();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  void addStaff(
-      NhanVien nhanVien, Function onSuccess, Function(String) onfailure) async {
-    try {
-      nhanVienDAO.createStaff(nhanVien, onSuccess, onfailure);
-    } catch (e) {}
+  void addStaff(NhanVien nhanVien) async {
+    nhanVien.username = nhanVien.username + "@gmail.com";
+    nhanVienDAO.createStaff(nhanVien);
   }
 
-  void deleteStaff(
+  void disableStaff(
       String id, Function onSuccess, Function(String) onfailure) async {
-    nhanVienDAO.deleteStaff(id, onSuccess, onfailure);
+    nhanVienDAO.disableStaff(id, onSuccess, onfailure);
   }
 
   void deleteTable(

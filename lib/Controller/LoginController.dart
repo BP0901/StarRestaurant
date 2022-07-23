@@ -14,6 +14,10 @@ class LoginController {
       String userId = FirebaseAuth.instance.currentUser!.uid;
       NhanVien nhanVien =
           await _nhanVienDAO.getNhanVienById(userId, onSignInError);
+      if (nhanVien.disable) {
+        onSignInError("Tài khoản hiện tại đang bị khóa!");
+        return;
+      }
       onSuccess(nhanVien.role);
     }
   }
