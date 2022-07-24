@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class HoaDonDAO {
   final _refHoaDon = FirebaseFirestore.instance.collection("HoaDon");
-  final _refBanAn = FirebaseFirestore.instance.collection("BanAn");
+  final _refBanDangSuDung =
+      FirebaseFirestore.instance.collection("BanDangSuDung");
   final _refMonAnDaGoi =
       FirebaseFirestore.instance.collection("MonAnDaXacNhan");
   final User? _user = FirebaseAuth.instance.currentUser;
@@ -15,10 +16,9 @@ class HoaDonDAO {
         .doc(bill.id)
         .update({"status": "paid", "idCashier": _user!.uid})
         .then((value) {
-          _refBanAn.doc(idTable).update({
+          _refBanDangSuDung.doc(idTable).update({
             "idUser": "",
             "isPaying": false,
-            "isUsing": false,
           });
           _refMonAnDaGoi
               .where("idTable", isEqualTo: idTable)
