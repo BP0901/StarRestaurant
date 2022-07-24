@@ -445,7 +445,6 @@ class _addStaff extends State<AddStaff> {
               onPressed: () {
                 String name = _nameEditingController.text.trim();
                 bool isvalid = _staffBloc.isNameValid(name);
-                print(isvalid);
                 if (isvalid) {
                   if (_dateEditingController.text.trim().isEmpty ||
                       _dateEditingController.text.trim() == "") {

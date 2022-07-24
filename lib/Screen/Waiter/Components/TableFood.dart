@@ -17,7 +17,7 @@ class TableFood extends StatefulWidget {
 class _TableFoodState extends State<TableFood> {
   WaiterController waiterController = WaiterController();
   final Stream<QuerySnapshot> _tableStream =
-      FirebaseFirestore.instance.collection('BanAn').snapshots();
+      FirebaseFirestore.instance.collection('BanDangSuDung').snapshots();
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -47,29 +47,46 @@ class _TableFoodState extends State<TableFood> {
   }
 
   Widget _buildTableRow(int index, DocumentSnapshot? document) {
-    return GestureDetector(
-      onTap: () {
-        waiterController.showTableInfo(document, () {
-          Get.to(TableInfomationActivity(tableFood: document));
-        }, (msg) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: FlashMessageScreen(
-                  type: "Thông báo", content: msg, color: kPrimaryColor),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
-          );
+    return StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection("BanAn")
+            .doc(document!.id)
+            .snapshots(),
+        builder: (context, banan) {
+          if (!banan.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              ),
+            );
+          } else {
+            return GestureDetector(
+              onTap: () {
+                waiterController.showTableInfo(document, () {
+                  Get.to(TableInfomationActivity(tableFood: document));
+                }, (msg) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: FlashMessageScreen(
+                          type: "Thông báo",
+                          content: msg,
+                          color: kPrimaryColor),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                  );
+                });
+              },
+              child: document.get('idUser') != ""
+                  ? _navailableTableRow(document, banan.data!.get('name'))
+                  : _availableTableRow(document, banan.data!.get('name')),
+            );
+          }
         });
-      },
-      child: document?.get('isUsing')
-          ? _navailableTableRow(document)
-          : _availableTableRow(document),
-    );
   }
 
-  Padding _availableTableRow(DocumentSnapshot? document) {
+  Padding _availableTableRow(DocumentSnapshot? document, String name) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -80,7 +97,7 @@ class _TableFoodState extends State<TableFood> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                document?.get('name'),
+                name,
                 textScaleFactor: 1.5,
                 style: const TextStyle(color: Colors.white),
               ),
@@ -96,7 +113,7 @@ class _TableFoodState extends State<TableFood> {
     );
   }
 
-  Padding _navailableTableRow(DocumentSnapshot? document) {
+  Padding _navailableTableRow(DocumentSnapshot? document, String name) {
     Color rowColor =
         document!.get('idUser') == FirebaseAuth.instance.currentUser!.uid
             ? Colors.green
@@ -112,7 +129,7 @@ class _TableFoodState extends State<TableFood> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                document.get('name'),
+                name,
                 textScaleFactor: 1.5,
                 style: const TextStyle(color: Colors.white),
               ),

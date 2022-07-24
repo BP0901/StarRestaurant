@@ -6,10 +6,20 @@ import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class WaiterController {
   BanAnDAO banAnDAO = BanAnDAO();
+  final User? _user = FirebaseAuth.instance.currentUser;
 
   void showTableInfo(DocumentSnapshot? document, Function onSuccess,
       Function(String) onErrorChecked) {
-    banAnDAO.checkIsUsingAndUser(document, onSuccess, onErrorChecked);
+    if (document!.get('idUser') == "") {
+      onSuccess();
+      return;
+    }
+    bool checkCurrentUser = document.get('idUser') == _user!.uid ? true : false;
+    if (checkCurrentUser) {
+      onSuccess();
+    } else {
+      onErrorChecked('Bàn này không được phép xem!');
+    }
   }
 
   void confirmOrders(
@@ -19,16 +29,17 @@ class WaiterController {
 
   void orderFood(DocumentSnapshot? tableFood, DocumentSnapshot? food,
       int amount, String note, Function onSuccess, Function(String) onfailure) {
-    if (tableFood!.get('isUsing')) {
+    bool isUsing = tableFood!.get('idUser') == "" ? false : true;
+    if (isUsing) {
       if (FirebaseAuth.instance.currentUser!.uid == tableFood.get('idUser')) {
         banAnDAO.addConfirmFood(
-            tableFood.get("id"), food, amount, note, onSuccess, onfailure);
+            tableFood.id, food, amount, note, onSuccess, onfailure);
       } else {
         onfailure("Bàn này đã có người phục vụ!");
       }
     } else {
       banAnDAO.addConfirmFoodtoNewTable(
-          tableFood.get("id"), food, amount, note, onSuccess, onfailure);
+          tableFood.id, food, amount, note, onSuccess, onfailure);
     }
   }
 
@@ -81,7 +92,13 @@ class WaiterController {
     banAnDAO.changeTable(fromTableId, toTableId, onSuccess, onfailure);
   }
 
-  void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
+  Future<void> payTheBill(
+      String idT, Function onSuccess, Function(String) onfailure) async {
+    bool isPaying = await banAnDAO.isPayingTable(idT);
+    if (isPaying) {
+      onfailure("Bàn đã gửi yêu cầu thanh toán!");
+      return;
+    }
     banAnDAO.payTheBill(idT, onSuccess, onfailure);
   }
 

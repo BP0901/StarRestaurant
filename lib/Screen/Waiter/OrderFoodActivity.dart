@@ -184,17 +184,6 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
                     padding: const EdgeInsets.all(kDefaultPadding),
                     child: Column(
                       children: [
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(top: kDefaultPadding / 2),
-                          child: Text(
-                            widget.tableFood!.get('name'),
-                            textScaleFactor: 2,
-                            style: const TextStyle(
-                                color: kPrimaryColor,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -207,7 +196,7 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
                               document.get('name'),
                               textScaleFactor: 1.5,
                               style: const TextStyle(
-                                  color: Colors.white,
+                                  color: kPrimaryColor,
                                   fontStyle: FontStyle.italic),
                             ),
                           ],
@@ -271,7 +260,10 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
                                 WaiterController waiterController =
                                     WaiterController();
                                 waiterController.orderFood(
-                                    widget.tableFood, document, _amount, _noteController.text.trim(), () {
+                                    widget.tableFood,
+                                    document,
+                                    _amount,
+                                    _noteController.text.trim(), () {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: FlashMessageScreen(

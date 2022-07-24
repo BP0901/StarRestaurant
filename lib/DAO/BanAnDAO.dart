@@ -4,22 +4,9 @@ import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class BanAnDAO {
   final User? _user = FirebaseAuth.instance.currentUser;
-  final _ref = FirebaseFirestore.instance.collection('BanAn');
-
-  void checkIsUsingAndUser(DocumentSnapshot? document, Function onSuccess,
-      Function(String) onErrorChecked) {
-    if (!document!.get('isUsing')) {
-      onSuccess();
-    } else {
-      bool checkCurrentUser =
-          document.get('idUser') == _user!.uid ? true : false;
-      if (checkCurrentUser) {
-        onSuccess();
-      } else {
-        onErrorChecked('Bàn này không được phép xem!');
-      }
-    }
-  }
+  final _refBanAn = FirebaseFirestore.instance.collection('BanAn');
+  final _refBanDanSuDung =
+      FirebaseFirestore.instance.collection('BanDangSuDung');
 
   //Xác nhận đặt món
   void confirmOrders(
@@ -90,8 +77,9 @@ class BanAnDAO {
       "note": note,
       "status": "new"
     }).then((value) {
-      _ref.doc(idTable).update({"isUsing": true, "idUser": _user!.uid}).then(
-          (value) => onSuccess());
+      _refBanDanSuDung
+          .doc(idTable)
+          .update({"idUser": _user!.uid}).then((value) => onSuccess());
     }).catchError((onError) {
       print("err: " + onError.toString());
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
@@ -118,7 +106,7 @@ class BanAnDAO {
               .get()
               .then((confirmedFood) {
             if (confirmedFood.size == 0) {
-              _ref.doc(idTable).update({"isUsing": false, "idUser": ""});
+              _refBanAn.doc(idTable).update({"isUsing": false, "idUser": ""});
             }
           });
         }
@@ -168,7 +156,7 @@ class BanAnDAO {
                 .get()
                 .then((foodConfirm) {
               if (foodConfirm.size == 0) {
-                _ref.doc(idTable).update({"isUsing": false, "idUser": ""});
+                _refBanAn.doc(idTable).update({"isUsing": false, "idUser": ""});
               }
             });
           }
@@ -179,7 +167,7 @@ class BanAnDAO {
 
   void createTable(String name, bool type, Function onSuccess,
       Function(String) onRegisterError) {
-    _ref.add({
+    _refBanAn.add({
       'name': name,
       'type': type,
       'idUser': '',
@@ -246,8 +234,8 @@ class BanAnDAO {
       });
     }).whenComplete(() {
       // Cập nhật user phục vụ bàn ăn
-      _ref.doc(fromTableId).update({"isUsing": false, "idUser": ""});
-      _ref.doc(toTableId).update({"isUsing": true, "idUser": _user!.uid});
+      _refBanDanSuDung.doc(fromTableId).update({"idUser": ""});
+      _refBanDanSuDung.doc(toTableId).update({"idUser": _user!.uid});
       onSuccess();
     }).catchError((err) {
       print("err: " + err.toString());
@@ -342,12 +330,21 @@ class BanAnDAO {
       });
 
       // Chuyển trạng thái bàn thành đang thanh toán
-      _ref.doc(idT).update({"isPaying": true});
+      _refBanDanSuDung.doc(idT).update({"isPaying": true});
       onSuccess();
     }).catchError((onError) {
       print("err: " + onError.toString());
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
     });
+  }
+
+  Future<bool> isPayingTable(String idTable) async {
+    bool isPaying = false;
+    await _refBanDanSuDung
+        .doc(idTable)
+        .get()
+        .then((value) => isPaying = value.get('isPaying'));
+    return isPaying;
   }
 
   // Ghép bàn ăn

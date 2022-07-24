@@ -59,6 +59,8 @@ class _LoginActivityState extends State<LoginActivity> {
 
   @override
   Widget build(BuildContext context) {
+    _usernameController.text = "waiter1";
+    _passwordController.text = "123456";
     return Scaffold(
       body: Stack(
         children: <Widget>[

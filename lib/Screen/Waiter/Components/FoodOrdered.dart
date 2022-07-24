@@ -19,7 +19,7 @@ class FoodOrdered extends StatefulWidget {
 
 class _FoodOrderedState extends State<FoodOrdered> {
   DocumentSnapshot? _tableFood;
-  List<dynamic> _listTable = [];
+  final List<dynamic> _listTable = [];
 
   @override
   void initState() {
@@ -29,14 +29,14 @@ class _FoodOrderedState extends State<FoodOrdered> {
 
   @override
   Widget build(BuildContext context) {
-    var _idT = _tableFood!.get('id');
+    var _idT = _tableFood!.id;
     WaiterController waiterController = WaiterController();
     return Scaffold(
       body: Material(
         child: Container(
           color: kSupColor,
           child: Column(children: [
-            _headerPage(_idT),
+            _headerPage(_tableFood),
             StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection("MonAnDaXacNhan")
@@ -194,121 +194,155 @@ class _FoodOrderedState extends State<FoodOrdered> {
             ));
   }
 
-  Widget _headerPage(String idT) {
+  Widget _headerPage(DocumentSnapshot? tableFood) {
+    String idT = tableFood!.id;
     bool hasData = false;
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 10, top: 10),
-          child: Text(
-            _tableFood!.get('name'),
-            textScaleFactor: 2,
-            style: const TextStyle(
-              color: kPrimaryColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection("MonAnDaXacNhan")
-                .where("idTable", isEqualTo: idT)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+    return StreamBuilder<DocumentSnapshot>(
+        stream:
+            FirebaseFirestore.instance.collection('BanAn').doc(idT).snapshots(),
+        builder: (context, banan) {
+          if (!banan.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor),
+              ),
+            );
+          } else {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10, top: 10),
+                  child: Text(
+                    banan.data!.get('name'),
+                    textScaleFactor: 2,
+                    style: const TextStyle(
+                      color: kPrimaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                );
-              } else {
-                hasData = snapshot.data!.size == 0 ? false : true;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10, top: 10),
-                  child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: hasData ? Colors.green : kPrimaryColor,
-                            width: 2),
-                      ),
-                      onPressed: hasData
-                          ? () => showDialog(
-                              context: context,
-                              builder: (ConfirmDialogContext) => AlertDialog(
-                                    backgroundColor: kSupColor,
-                                    title: const Text(
-                                      'Yêu cầu thanh toán?',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(context, 'Hủy'),
-                                        child: const Text(
-                                          'Hủy',
-                                          style:
-                                              TextStyle(color: kPrimaryColor),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          WaiterController waiterController =
-                                              WaiterController();
-                                          waiterController.payTheBill(idT, () {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: FlashMessageScreen(
-                                                    type: "Thông báo",
-                                                    content:
-                                                        "Gửi yêu cầu thanh toán thành công",
-                                                    color: Colors.green),
-                                                behavior:
-                                                    SnackBarBehavior.floating,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                elevation: 0,
+                ),
+                StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection("MonAnDaXacNhan")
+                        .where("idTable", isEqualTo: idT)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                          ),
+                        );
+                      } else {
+                        hasData = snapshot.data!.size == 0
+                            ? false
+                            : tableFood.get("isPaying")
+                                ? false
+                                : true;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 10, top: 10),
+                          child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                    color:
+                                        hasData ? Colors.green : kPrimaryColor,
+                                    width: 2),
+                              ),
+                              onPressed: hasData
+                                  ? () => showDialog(
+                                      context: context,
+                                      builder: (ConfirmDialogContext) =>
+                                          AlertDialog(
+                                            backgroundColor: kSupColor,
+                                            title: const Text(
+                                              'Yêu cầu thanh toán?',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(
+                                                    context, 'Hủy'),
+                                                child: const Text(
+                                                  'Hủy',
+                                                  style: TextStyle(
+                                                      color: kPrimaryColor),
+                                                ),
                                               ),
-                                            );
-                                          }, (msg) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                content: FlashMessageScreen(
-                                                    type: "Thông báo",
-                                                    content: msg,
-                                                    color: kPrimaryColor),
-                                                behavior:
-                                                    SnackBarBehavior.floating,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                elevation: 0,
+                                              TextButton(
+                                                onPressed: () {
+                                                  WaiterController
+                                                      waiterController =
+                                                      WaiterController();
+                                                  waiterController
+                                                      .payTheBill(idT, () {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: FlashMessageScreen(
+                                                            type: "Thông báo",
+                                                            content:
+                                                                "Gửi yêu cầu thanh toán thành công",
+                                                            color:
+                                                                Colors.green),
+                                                        behavior:
+                                                            SnackBarBehavior
+                                                                .floating,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        elevation: 0,
+                                                      ),
+                                                    );
+                                                  }, (msg) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content:
+                                                            FlashMessageScreen(
+                                                                type:
+                                                                    "Thông báo",
+                                                                content: msg,
+                                                                color:
+                                                                    kPrimaryColor),
+                                                        behavior:
+                                                            SnackBarBehavior
+                                                                .floating,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        elevation: 0,
+                                                      ),
+                                                    );
+                                                  });
+                                                  Navigator.pop(
+                                                      ConfirmDialogContext);
+                                                },
+                                                child: const Text(
+                                                  'OK',
+                                                  style: TextStyle(
+                                                      color: kPrimaryColor),
+                                                ),
                                               ),
-                                            );
-                                          });
-                                          Navigator.pop(ConfirmDialogContext);
-                                        },
-                                        child: const Text(
-                                          'OK',
-                                          style:
-                                              TextStyle(color: kPrimaryColor),
-                                        ),
-                                      ),
-                                    ],
-                                  ))
-                          : null,
-                      child: Text(
-                        "Thanh Toán",
-                        textScaleFactor: 2,
-                        style: TextStyle(
-                            color: hasData ? Colors.green : kPrimaryColor),
-                      )),
-                );
-              }
-            }),
-      ],
-    );
+                                            ],
+                                          ))
+                                  : null,
+                              child: Text(
+                                "Thanh Toán",
+                                textScaleFactor: 2,
+                                style: TextStyle(
+                                    color:
+                                        hasData ? Colors.green : kPrimaryColor),
+                              )),
+                        );
+                      }
+                    }),
+              ],
+            );
+          }
+        });
   }
 
   String _getTotal(amount, price) {
