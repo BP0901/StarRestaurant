@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:star_restaurant/Model/BanAn.dart';
 import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class BanAnDAO {
@@ -7,6 +9,7 @@ class BanAnDAO {
   final _refBanAn = FirebaseFirestore.instance.collection('BanAn');
   final _refBanDanSuDung =
       FirebaseFirestore.instance.collection('BanDangSuDung');
+  final _refBanDangGhep = FirebaseFirestore.instance.collection('BanDangGhep');
 
   //Xác nhận đặt món
   void confirmOrders(
@@ -244,7 +247,11 @@ class BanAnDAO {
   }
 
   // Yêu cầu thanh toán
-  void payTheBill(String idT, Function onSuccess, Function(String) onfailure) {
+  void payTheBill(
+      String idT,
+      List<DocumentSnapshot<Map<String, dynamic>>> listFoods,
+      Function onSuccess,
+      Function(String) onfailure) {
     // Tạo hóa đơn mới
     Timestamp payTime = Timestamp.fromDate(DateTime.now());
     FirebaseFirestore.instance.collection("HoaDon").add({
@@ -255,23 +262,16 @@ class BanAnDAO {
       "idCashier": "",
       "status": "unpaid"
     }).then((bill) {
-      // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
-      List<Map<String, dynamic>> list = [];
-      FirebaseFirestore.instance
-          .collection("MonAnDaXacNhan")
-          .where("idTable", isEqualTo: idT)
-          .get()
-          .then((orderedFood) {
-        orderedFood.docs.forEach((food) {
-          list.add(food.data());
-        });
+        // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
+        List<Map<String, dynamic>?> list = [];
+        listFoods.forEach((food) => list.add(food.data()));
 
         List<Map<String, dynamic>> checkedList = []; // list món ăn đã duyệt
         // Duyệt qua từng món ăn đã gọi
         for (int i = 0; i < list.length; i++) {
           bool flag = false; // biến kiểm tra món ăn trùng nhau
           checkedList.forEach((element) {
-            if (element["idFood"] == list[i]["idFood"]) {
+            if (element["idFood"] == list[i]!["idFood"]) {
               flag = true;
             }
           });
@@ -280,21 +280,21 @@ class BanAnDAO {
             continue;
           } else {
             // nếu chưa có món ăn trong checkedList
-            List<Map<String, dynamic>> temp = [];
+            List<Map<String, dynamic>?> temp = [];
             temp.add(list[i]); // thêm mới vào món ăn mới đầu tiên
             for (int j = i + 1; j < list.length; j++) {
               // kiểm tra thêm vào tất cả các món ăn giống nhau
-              if (list[i]["idFood"] == list[j]["idFood"]) {
+              if (list[i]!["idFood"] == list[j]!["idFood"]) {
                 temp.add(list[j]);
               }
             }
             // rút về 1 món với tổng số lượng
-            Map<String, dynamic> temp1 = temp[0];
+            Map<String, dynamic>? temp1 = temp[0];
             dynamic amount = 0;
             temp.forEach((food) {
-              amount += food["amount"];
+              amount += food!["amount"];
             });
-            temp1["amount"] = amount;
+            temp1!["amount"] = amount;
             checkedList
                 .add(temp1); // Thêm món đã cập nhật số lượng vào checkedList
           }
@@ -315,23 +315,22 @@ class BanAnDAO {
             .collection("HoaDon")
             .doc(bill.id)
             .update({"total": total});
-      });
-    }).whenComplete(() {
-      // Xóa các món ăn trong danh sách tạm gọi
-      FirebaseFirestore.instance
-          .collection('MonAnTamGoi')
-          .where("idTable", isEqualTo: idT)
-          .get()
-          .then((foodConfirm) {
-        foodConfirm.docs.forEach((food) => FirebaseFirestore.instance
+      }).whenComplete(() {
+        // Xóa các món ăn trong danh sách tạm gọi
+        FirebaseFirestore.instance
             .collection('MonAnTamGoi')
-            .doc(food.id)
-            .delete());
-      });
+            .where("idTable", isEqualTo: idT)
+            .get()
+            .then((foodConfirm) {
+          foodConfirm.docs.forEach((food) => FirebaseFirestore.instance
+              .collection('MonAnTamGoi')
+              .doc(food.id)
+              .delete());
+        });
 
-      // Chuyển trạng thái bàn thành đang thanh toán
-      _refBanDanSuDung.doc(idT).update({"isPaying": true});
-      onSuccess();
+        // Chuyển trạng thái bàn thành đang thanh toán
+        _refBanDanSuDung.doc(idT).update({"isPaying": true});
+        onSuccess();
     }).catchError((onError) {
       print("err: " + onError.toString());
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
@@ -347,22 +346,67 @@ class BanAnDAO {
     return isPaying;
   }
 
-  // Ghép bàn ăn
-  // Future<void> mergeTables(Map<String, String> listTableToSave,
-  //     Function onSuccess, Function(String) onfailure) async {
-  //   listTableToSave.forEach((key, value) async {
-  //     await FirebaseFirestore.instance
-  //         .collection("BanDangGhep")
-  //         .get()
-  //         .then((value) => value.docs.forEach((element) {
-  //               if (element.data().containsValue(value)) {
-  //                 FirebaseFirestore.instance
-  //                     .collection("BanDangGhep")
-  //                     .doc(element.id)
-  //                     .delete();
-  //               }
-  //             }));
-  //   });
-  //   await FirebaseFirestore.instance.collection("BanDangGhep").doc().set({listTableToSave.});
-  // }
+  Future<BanAn> getBanAnbyID(String id) async {
+    BanAn banAn = BanAn.origin();
+    await _refBanAn
+        .doc(id)
+        .get()
+        .then((value) => banAn = BanAn.fromDocument(value));
+    return banAn;
+  }
+
+  //Ghép bàn ăn
+  void setNewMergeTables(Map<String, dynamic> list) {
+    _refBanDangGhep
+        .add(list)
+        .then((merge) => list.forEach((key, value) {
+              _refBanDanSuDung
+                  .doc(value)
+                  .update({'isMerging': merge.id, 'idUser': _user!.uid});
+            }))
+        .catchError((onError) => print(onError))
+        .whenComplete(() => Fluttertoast.showToast(msg: "Ghép thành công!"));
+  }
+
+  //Ghép bàn ăn
+  void setMergeTables(Map<String, dynamic> list, String idMerged) {
+    _refBanDangGhep
+        .doc(idMerged)
+        .set(list, SetOptions(merge: true))
+        .then((merge) => list.forEach((key, value) {
+              _refBanDanSuDung
+                  .doc(value)
+                  .update({'isMerging': idMerged, 'idUser': _user!.uid});
+            }))
+        .catchError((onError) => print(onError))
+        .whenComplete(() => Fluttertoast.showToast(msg: "Ghép thành công!"));
+  }
+
+  Future<bool> isMergingTable(String idTable) async {
+    bool isMerging = false;
+    await _refBanDanSuDung.doc(idTable).get().then((table) {
+      if (table.get('isMerging') != "") {
+        isMerging = true;
+      }
+    });
+    return isMerging;
+  }
+
+  Future<List<dynamic>> getMergeTables(String idMerged) async {
+    List<dynamic> list = [];
+    await _refBanDangGhep
+        .doc(idMerged)
+        .get()
+        .then((value) => list = value.data()!.values.toList());
+    return list;
+  }
+
+  Future<String> getRefMergeredTable(String idTable) async {
+    String id = "";
+    await _refBanDanSuDung
+        .doc(idTable)
+        .get()
+        .then((value) => id = value.get('isMerging'));
+    return id;
+  }
 }

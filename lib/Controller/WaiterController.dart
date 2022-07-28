@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:star_restaurant/DAO/BanAnDAO.dart';
+import 'package:star_restaurant/DAO/MonAnDAO.dart';
 import 'package:star_restaurant/Model/BanAn.dart';
 import 'package:star_restaurant/Model/MonAnDaGoi.dart';
 
 class WaiterController {
   BanAnDAO banAnDAO = BanAnDAO();
+  MonAnDAO monAnDAO = MonAnDAO();
   final User? _user = FirebaseAuth.instance.currentUser;
 
   void showTableInfo(DocumentSnapshot? document, Function onSuccess,
@@ -93,29 +95,64 @@ class WaiterController {
   }
 
   Future<void> payTheBill(
-      String idT, Function onSuccess, Function(String) onfailure) async {
+      String idT,
+      Future<List<DocumentSnapshot<Map<String, dynamic>>>> listFoods,
+      Function onSuccess,
+      Function(String) onfailure) async {
     bool isPaying = await banAnDAO.isPayingTable(idT);
     if (isPaying) {
       onfailure("Bàn đã gửi yêu cầu thanh toán!");
       return;
     }
-    banAnDAO.payTheBill(idT, onSuccess, onfailure);
+    List<DocumentSnapshot<Map<String, dynamic>>> list = await listFoods;
+    banAnDAO.payTheBill(idT, list, onSuccess, onfailure);
   }
 
-  void mergeTables(Map<int, Map<BanAn, bool>> listBanAn, Function onSuccess,
-      Function(String) onfailure) {
-    List<BanAn> listCheckedBanAn = [];
+  Future<void> mergeTables(
+      DocumentSnapshot? curTable,
+      Map<DocumentSnapshot?, bool> listBanAn,
+      Function onSuccess,
+      Function(String) onfailure) async {
+    List<DocumentSnapshot?> listCheckedBanAn = [];
     // Lọc các table true(đã chọn)
     listBanAn.forEach((key, value) {
-      if (value.containsValue(true)) {
-        listCheckedBanAn.add(value.keys.first);
+      if (value == true) {
+        listCheckedBanAn.add(key);
       }
     });
-    // MAp dữ liệu để lưu xuống firebase
-    Map<String, String> listTableToSave = Map<String, String>();
-    listCheckedBanAn.forEach((element) {
-      listTableToSave.addAll({element.name: element.id});
+    // Map dữ liệu để lưu xuống firebase
+    Map<String, dynamic> listTableToSave = <String, dynamic>{};
+    await Future.forEach(listCheckedBanAn, (DocumentSnapshot? element) async {
+      BanAn banAn = await banAnDAO.getBanAnbyID(element!.id);
+      listTableToSave.addAll({banAn.name: element.id});
     });
-    // banAnDAO.mergeTables(listTableToSave, onSuccess, onfailure);
+    String isMerging = curTable!.get('isMerging');
+    //ghép bàn ăn mới
+    if (isMerging.isEmpty) {
+      banAnDAO.setNewMergeTables(listTableToSave);
+    } else {
+      //Ghép thêm bàn ăn
+      listTableToSave.removeWhere((key, value) => value == curTable.id);
+      banAnDAO.setMergeTables(listTableToSave, isMerging);
+    }
   }
+
+  Future<bool> isMergingTable(String idTable) =>
+      banAnDAO.isMergingTable(idTable);
+
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> getAllFoodinTables(
+      String idTable) async {
+    List<DocumentSnapshot<Map<String, dynamic>>> listFoods = [];
+    //Lấy đường dẫn tới danh sách bàn ghép
+    String idMerged = await banAnDAO.getRefMergeredTable(idTable);
+    //Lấy id các bàn đã ghép
+    List<dynamic> listIdTables = await banAnDAO.getMergeTables(idMerged);
+    //Lấy các món ăn theo danh sách id bàn
+    listFoods = await monAnDAO.getAllFoodInTables(listIdTables);
+    return listFoods;
+  }
+
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> getAllFood(
+          String idTable) async =>
+      await monAnDAO.getAllFoodbyIdTable(idTable);
 }

@@ -118,7 +118,7 @@ class _TableFoodState extends State<TableFood> {
         document!.get('idUser') == FirebaseAuth.instance.currentUser!.uid
             ? Colors.green
             : kPrimaryColor;
-    bool isMerging = document.get('isMerging');
+    String isMerging = document.get('isMerging');
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -133,14 +133,14 @@ class _TableFoodState extends State<TableFood> {
                 textScaleFactor: 1.5,
                 style: const TextStyle(color: Colors.white),
               ),
-              isMerging
+              isMerging.isEmpty
                   ? const Text(
-                      "Đang ghép",
+                      "",
                       textScaleFactor: 1.5,
                       style: TextStyle(color: Colors.white),
                     )
                   : const Text(
-                      "",
+                      "Đang ghép",
                       textScaleFactor: 1.5,
                       style: TextStyle(color: Colors.white),
                     ),

@@ -19,11 +19,12 @@ class FoodOrdered extends StatefulWidget {
 
 class _FoodOrderedState extends State<FoodOrdered> {
   DocumentSnapshot? _tableFood;
-  final List<dynamic> _listTable = [];
+  late Future<List<DocumentSnapshot<Map<String, dynamic>>>> listFoods;
 
   @override
   void initState() {
     _tableFood = widget.tableFood;
+    listFoods = _getData();
     super.initState();
   }
 
@@ -37,11 +38,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
           color: kSupColor,
           child: Column(children: [
             _headerPage(_tableFood),
-            StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection("MonAnDaXacNhan")
-                    .where("idTable", isEqualTo: _idT)
-                    .snapshots(),
+            FutureBuilder<List<DocumentSnapshot>>(
+                future: listFoods,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(
@@ -276,8 +274,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                                   WaiterController
                                                       waiterController =
                                                       WaiterController();
-                                                  waiterController
-                                                      .payTheBill(idT, () {
+                                                  waiterController.payTheBill(
+                                                      idT, listFoods, () {
                                                     ScaffoldMessenger.of(
                                                             context)
                                                         .showSnackBar(
@@ -567,9 +565,9 @@ class _FoodOrderedState extends State<FoodOrdered> {
   }
 
   _dataTable(BuildContext context, WaiterController waiterController,
-      AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
-    return List<DataRow>.generate(snapshot.data!.size, (index) {
-      MonAnDaGoi monAn = MonAnDaGoi.fromDocument(snapshot.data!.docs[index]);
+      AsyncSnapshot<List<DocumentSnapshot<Object?>>> listFoods) {
+    return List<DataRow>.generate(listFoods.data!.length, (index) {
+      MonAnDaGoi monAn = MonAnDaGoi.fromDocument(listFoods.data![index]);
       return DataRow(
           onLongPress: () =>
               _changeOrDelFood(context, monAn, index, waiterController),
@@ -604,5 +602,17 @@ class _FoodOrderedState extends State<FoodOrdered> {
             )),
           ]);
     });
+  }
+
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> _getData() async {
+    late Future<List<DocumentSnapshot<Map<String, dynamic>>>> list;
+    WaiterController waiterController = WaiterController();
+    bool isMerging = await waiterController.isMergingTable(_tableFood!.id);
+    if (isMerging) {
+      list = waiterController.getAllFoodinTables(_tableFood!.id);
+    } else {
+      list = waiterController.getAllFood(_tableFood!.id);
+    }
+    return list;
   }
 }

@@ -102,4 +102,28 @@ class MonAnDAO {
         .then((value) => size = value.size);
     return size;
   }
+
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> getAllFoodInTables(
+      List listIdTables) async {
+    List<DocumentSnapshot<Map<String, dynamic>>> list = [];
+    await Future.forEach(
+        listIdTables,
+        (dynamic idTable) => conllectionMADXN
+            .where('idTable', isEqualTo: idTable)
+            .get()
+            .then((foods) =>
+                foods.docs.forEach((dynamic food) => list.add(food))));
+    return list;
+  }
+
+  Future<List<DocumentSnapshot<Map<String, dynamic>>>> getAllFoodbyIdTable(
+      String idTable) async {
+    List<DocumentSnapshot<Map<String, dynamic>>> list = [];
+    await conllectionMADXN
+        .where('idTable', isEqualTo: idTable)
+        .get()
+        .then((foods) => foods.docs.forEach((dynamic food) => list.add(food)))
+        .catchError((onError) => print(onError));
+    return list;
+  }
 }
