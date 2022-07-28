@@ -109,7 +109,7 @@ class BanAnDAO {
               .get()
               .then((confirmedFood) {
             if (confirmedFood.size == 0) {
-              _refBanAn.doc(idTable).update({"isUsing": false, "idUser": ""});
+              _refBanDanSuDung.doc(idTable).update({"idUser": ""});
             }
           });
         }
@@ -159,7 +159,7 @@ class BanAnDAO {
                 .get()
                 .then((foodConfirm) {
               if (foodConfirm.size == 0) {
-                _refBanAn.doc(idTable).update({"isUsing": false, "idUser": ""});
+                _refBanDanSuDung.doc(idTable).update({"idUser": ""});
               }
             });
           }
@@ -173,8 +173,6 @@ class BanAnDAO {
     _refBanAn.add({
       'name': name,
       'type': type,
-      'idUser': '',
-      'isUsing': false,
     }).then((documentSnapshot) {
       FirebaseFirestore.instance
           .collection('BanAn')
@@ -262,75 +260,75 @@ class BanAnDAO {
       "idCashier": "",
       "status": "unpaid"
     }).then((bill) {
-        // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
-        List<Map<String, dynamic>?> list = [];
-        listFoods.forEach((food) => list.add(food.data()));
+      // Duyệt món ăn đã gọi để thêm vào Chi tiết hóa đơn
+      List<Map<String, dynamic>?> list = [];
+      listFoods.forEach((food) => list.add(food.data()));
 
-        List<Map<String, dynamic>> checkedList = []; // list món ăn đã duyệt
-        // Duyệt qua từng món ăn đã gọi
-        for (int i = 0; i < list.length; i++) {
-          bool flag = false; // biến kiểm tra món ăn trùng nhau
-          checkedList.forEach((element) {
-            if (element["idFood"] == list[i]!["idFood"]) {
-              flag = true;
-            }
-          });
-          if (flag) {
-            // nếu đã có món ăn trong checkedList
-            continue;
-          } else {
-            // nếu chưa có món ăn trong checkedList
-            List<Map<String, dynamic>?> temp = [];
-            temp.add(list[i]); // thêm mới vào món ăn mới đầu tiên
-            for (int j = i + 1; j < list.length; j++) {
-              // kiểm tra thêm vào tất cả các món ăn giống nhau
-              if (list[i]!["idFood"] == list[j]!["idFood"]) {
-                temp.add(list[j]);
-              }
-            }
-            // rút về 1 món với tổng số lượng
-            Map<String, dynamic>? temp1 = temp[0];
-            dynamic amount = 0;
-            temp.forEach((food) {
-              amount += food!["amount"];
-            });
-            temp1!["amount"] = amount;
-            checkedList
-                .add(temp1); // Thêm món đã cập nhật số lượng vào checkedList
+      List<Map<String, dynamic>> checkedList = []; // list món ăn đã duyệt
+      // Duyệt qua từng món ăn đã gọi
+      for (int i = 0; i < list.length; i++) {
+        bool flag = false; // biến kiểm tra món ăn trùng nhau
+        checkedList.forEach((element) {
+          if (element["idFood"] == list[i]!["idFood"]) {
+            flag = true;
           }
-        }
-        dynamic total = 0;
-        checkedList.forEach((check) {
-          //Duyệt checkedList để lưu vào ChiTietHoaDon và tổng tiền cảu bill
-          total += check['amount'] * check['price'];
-          FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
-            "idBill": bill.id,
-            "foodName": check["name"],
-            "idFood": check['idFood'],
-            "amount": check['amount'],
-            "price": check['price']
+        });
+        if (flag) {
+          // nếu đã có món ăn trong checkedList
+          continue;
+        } else {
+          // nếu chưa có món ăn trong checkedList
+          List<Map<String, dynamic>?> temp = [];
+          temp.add(list[i]); // thêm mới vào món ăn mới đầu tiên
+          for (int j = i + 1; j < list.length; j++) {
+            // kiểm tra thêm vào tất cả các món ăn giống nhau
+            if (list[i]!["idFood"] == list[j]!["idFood"]) {
+              temp.add(list[j]);
+            }
+          }
+          // rút về 1 món với tổng số lượng
+          Map<String, dynamic>? temp1 = temp[0];
+          dynamic amount = 0;
+          temp.forEach((food) {
+            amount += food!["amount"];
           });
+          temp1!["amount"] = amount;
+          checkedList
+              .add(temp1); // Thêm món đã cập nhật số lượng vào checkedList
+        }
+      }
+      dynamic total = 0;
+      checkedList.forEach((check) {
+        //Duyệt checkedList để lưu vào ChiTietHoaDon và tổng tiền cảu bill
+        total += check['amount'] * check['price'];
+        FirebaseFirestore.instance.collection("ChiTietHoaDon").add({
+          "idBill": bill.id,
+          "foodName": check["name"],
+          "idFood": check['idFood'],
+          "amount": check['amount'],
+          "price": check['price']
         });
-        FirebaseFirestore.instance
-            .collection("HoaDon")
-            .doc(bill.id)
-            .update({"total": total});
-      }).whenComplete(() {
-        // Xóa các món ăn trong danh sách tạm gọi
-        FirebaseFirestore.instance
+      });
+      FirebaseFirestore.instance
+          .collection("HoaDon")
+          .doc(bill.id)
+          .update({"total": total});
+    }).whenComplete(() {
+      // Xóa các món ăn trong danh sách tạm gọi
+      FirebaseFirestore.instance
+          .collection('MonAnTamGoi')
+          .where("idTable", isEqualTo: idT)
+          .get()
+          .then((foodConfirm) {
+        foodConfirm.docs.forEach((food) => FirebaseFirestore.instance
             .collection('MonAnTamGoi')
-            .where("idTable", isEqualTo: idT)
-            .get()
-            .then((foodConfirm) {
-          foodConfirm.docs.forEach((food) => FirebaseFirestore.instance
-              .collection('MonAnTamGoi')
-              .doc(food.id)
-              .delete());
-        });
+            .doc(food.id)
+            .delete());
+      });
 
-        // Chuyển trạng thái bàn thành đang thanh toán
-        _refBanDanSuDung.doc(idT).update({"isPaying": true});
-        onSuccess();
+      // Chuyển trạng thái bàn thành đang thanh toán
+      _refBanDanSuDung.doc(idT).update({"isPaying": true});
+      onSuccess();
     }).catchError((onError) {
       print("err: " + onError.toString());
       onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
@@ -409,4 +407,41 @@ class BanAnDAO {
         .then((value) => id = value.get('isMerging'));
     return id;
   }
+
+  Future<String> getTableName(String idTable) async {
+    String name = "";
+    await _refBanAn
+        .doc(idTable)
+        .get()
+        .then((table) => name = table.get("name"));
+    return name;
+  }
+
+  void delMergedTable(String idMergedTables, String nameTable, String idTable) {
+    _refBanDangGhep
+        .doc(idMergedTables)
+        .update({nameTable: FieldValue.delete()})
+        .then(
+            (value) => _refBanDanSuDung.doc(idTable).update({"isMerging": ""}))
+        .catchError((onError) => print(onError))
+        .whenComplete(() => Fluttertoast.showToast(msg: "Xóa thành công!"));
+  }
+
+  void unuseTable(idTable) => FirebaseFirestore.instance
+          .collection('MonAnTamGoi')
+          .where("idTable", isEqualTo: idTable)
+          .get()
+          .then((confirmFood) {
+        if (confirmFood.size == 0) {
+          FirebaseFirestore.instance
+              .collection("MonAnDaXacNhan")
+              .where("idTable", isEqualTo: idTable)
+              .get()
+              .then((confirmedFood) {
+            if (confirmedFood.size == 0) {
+              _refBanDanSuDung.doc(idTable).update({"idUser": ""});
+            }
+          });
+        }
+      });
 }

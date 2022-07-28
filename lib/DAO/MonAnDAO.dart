@@ -126,4 +126,13 @@ class MonAnDAO {
         .catchError((onError) => print(onError));
     return list;
   }
+
+  Future<int> foodInTable(idTable) async {
+    int hasFood = 0;
+    await conllectionMADXN
+        .where('idTable', isEqualTo: idTable)
+        .get()
+        .then((foods) => hasFood = foods.size);
+    return hasFood;
+  }
 }

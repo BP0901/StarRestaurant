@@ -155,4 +155,14 @@ class WaiterController {
   Future<List<DocumentSnapshot<Map<String, dynamic>>>> getAllFood(
           String idTable) async =>
       await monAnDAO.getAllFoodbyIdTable(idTable);
+
+  Future<String> getTableName(String idTable) async =>
+      banAnDAO.getTableName(idTable);
+
+  //Xóa bàn ăn đã ghép
+  Future<void> delMergedTable(
+      String idMerged, String nameTable, idTable) async {
+    banAnDAO.delMergedTable(idMerged, nameTable, idTable);
+    banAnDAO.unuseTable(idTable);
+  }
 }

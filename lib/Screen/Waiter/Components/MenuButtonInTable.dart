@@ -1,12 +1,12 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/WaiterController.dart';
-import 'package:star_restaurant/Model/BanAn.dart';
 import 'package:star_restaurant/Screen/Waiter/OrderFoodActivity.dart';
 
 import '../../../Util/Constants.dart';
@@ -59,11 +59,10 @@ buildMenuButton(DocumentSnapshot? currentTableFood, BuildContext context,
               },
             ),
             SpeedDialChild(
-              visible: isMerging,
-              child: const FaIcon(FontAwesomeIcons.info),
-              label: "Thông tin ghép bàn",
-              // onTap: () => _showTableMergedInfo(context, currentTableFood)
-            ),
+                visible: isMerging,
+                child: const FaIcon(FontAwesomeIcons.info),
+                label: "Thông tin ghép bàn",
+                onTap: () => _showTableMergedInfo(context, currentTableFood)),
           ],
         );
       });
@@ -205,19 +204,115 @@ Future<Map<DocumentSnapshot?, bool>> _getData(
 
 Future<dynamic> _showTableMergedInfo(
     BuildContext context, DocumentSnapshot currentTableFood) async {
-  String tablenames = await getTableNames(currentTableFood.id);
+  WaiterController waiterController = WaiterController();
+  String tablenames = await waiterController.getTableName(currentTableFood.id);
+  String idMergedTables = currentTableFood.get('isMerging');
   return showDialog(
       context: context,
       builder: (tableInfoDialog) => AlertDialog(
               backgroundColor: kSupColor,
-              title: const Text(
-                'Các bàn đang ghép:',
-                style: TextStyle(color: Colors.white),
-              ),
-              content: Text(
-                tablenames,
+              title: Text(
+                'Các bàn đang ghép với $tablenames :',
                 style: const TextStyle(color: Colors.white),
               ),
+              content: StreamBuilder<DocumentSnapshot<Map<String, dynamic>?>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('BanDangGhep')
+                      .doc(idMergedTables)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(kPrimaryColor),
+                        ),
+                      );
+                    } else {
+                      List<dynamic> idTables =
+                          snapshot.data!.data()!.values.toList();
+                      List<dynamic> nameTables =
+                          snapshot.data!.data()!.keys.toList();
+                      return SizedBox(
+                        width: double.maxFinite,
+                        height: 300,
+                        child: ListView.builder(
+                            itemCount: nameTables.length,
+                            itemBuilder: (context, index) => GestureDetector(
+                                  onTap: () => showDialog(
+                                      context: context,
+                                      builder: (confirmDialog) => AlertDialog(
+                                            backgroundColor: kSupColor,
+                                            title: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Row(
+                                                children: [
+                                                  const Text(
+                                                    "Bạn muốn hủy ghép với ",
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  Text(
+                                                    nameTables[index],
+                                                    style: const TextStyle(
+                                                        color: kPrimaryColor),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                  onPressed: () {},
+                                                  child: const Text(
+                                                    "Không",
+                                                    style: TextStyle(
+                                                        color: kPrimaryColor),
+                                                  )),
+                                              TextButton(
+                                                  onPressed: () {
+                                                    WaiterController
+                                                        waiterController =
+                                                        WaiterController();
+                                                    waiterController
+                                                        .delMergedTable(
+                                                            idMergedTables,
+                                                            nameTables[index],
+                                                            idTables[index]);
+                                                    Navigator.pop(
+                                                        confirmDialog);
+                                                    Navigator.pop(
+                                                        tableInfoDialog);
+                                                  },
+                                                  child: const Text(
+                                                    "Có",
+                                                    style: TextStyle(
+                                                        color: kPrimaryColor),
+                                                  )),
+                                            ],
+                                          )),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      color: kSecondaryColor,
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(
+                                                kDefaultPadding / 2),
+                                            child: Text(
+                                              nameTables[index],
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )),
+                      );
+                    }
+                  }),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(tableInfoDialog, 'Hủy'),
@@ -227,28 +322,6 @@ Future<dynamic> _showTableMergedInfo(
                   ),
                 ),
               ]));
-}
-
-Future<String> getTableNames(String idTable) async {
-  StringBuffer names = StringBuffer();
-  List<dynamic> listTableNames = [];
-  await FirebaseFirestore.instance
-      .collection("BanDangGhep")
-      .get()
-      .then((tables) {
-    tables.docs.forEach((table) {
-      if (table.data().values.contains(idTable)) {
-        listTableNames = table.data().keys.toList();
-      }
-    });
-  });
-  listTableNames.forEach((element) async {
-    String name = "";
-    names.write(element);
-    names.write("  ");
-  });
-
-  return names.toString();
 }
 
 Future<dynamic> _changeToNewTable(
@@ -295,7 +368,7 @@ Future<dynamic> _changeToNewTable(
                                 .doc(snapshot.data?.docs[index].id)
                                 .snapshots(),
                             builder: (context, banan) {
-                              if (!snapshot.hasData) {
+                              if (!banan.hasData) {
                                 return const Center(
                                   child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
@@ -303,10 +376,6 @@ Future<dynamic> _changeToNewTable(
                                   ),
                                 );
                               } else {
-                                String name = "";
-                                // if (banan.data!.get('id') == currentTableFood.id) {
-                                //   name = banan.data!.get('name');
-                                // }
                                 return GestureDetector(
                                   onTap: () {
                                     showDialog(
