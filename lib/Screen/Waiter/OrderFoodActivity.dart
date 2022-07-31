@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_format_money_vietnam/flutter_format_money_vietnam.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/WaiterController.dart';
 import 'package:star_restaurant/Util/Constants.dart';
@@ -125,11 +126,16 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
   }
 
   Padding _foodCard(DocumentSnapshot<Object?> document) {
+    bool isSoldOut = document.get('isSoldOut');
     return Padding(
       padding: const EdgeInsets.all(kDefaultPadding / 2),
       child: GestureDetector(
         onTap: () {
-          _buildOrderFoodSheet(document);
+          if (isSoldOut) {
+            Fluttertoast.showToast(msg: "Món hiện tạm hết!");
+          } else {
+            _buildOrderFoodSheet(document);
+          }
         },
         child: Container(
           decoration: BoxDecoration(
@@ -146,6 +152,14 @@ class _OrderFoodActivityState extends State<OrderFoodActivity> {
                         textScaleFactor: 1.5,
                         style: const TextStyle(color: Colors.white),
                       ),
+                      Visibility(
+                        visible: isSoldOut,
+                        child: const Text(
+                          " (Tạm hết)",
+                          textScaleFactor: 1.5,
+                          style: TextStyle(color: kWarninngColor),
+                        ),
+                      )
                     ],
                   ),
                   Row(

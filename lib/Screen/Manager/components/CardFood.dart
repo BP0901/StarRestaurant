@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:star_restaurant/Components/flash_message.dart';
 import 'package:star_restaurant/Controller/ManagerController.dart';
+import 'package:star_restaurant/Controller/WaiterController.dart';
 import 'package:star_restaurant/Screen/Manager/MenuScreen/EditMenuAxtivity.dart';
 import 'package:star_restaurant/Util/Constants.dart';
 
@@ -176,6 +177,7 @@ Widget buildFoodItem(BuildContext context, int index,
 }
 
 _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
+  bool isSoldOut = document!.get('isSoldOut');
   showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -183,62 +185,80 @@ _infoFood(BuildContext context, DocumentSnapshot<Object?>? document) {
             backgroundColor: kSupColor,
             title: Center(
               child: Text(
-                document!.get('name'),
+                document.get('name'),
                 style: const TextStyle(color: kPrimaryColor),
               ),
             ),
             content: SizedBox(
-              height: 120,
-              child: Column(children: [
-                Row(
-                  children: [
-                    const Text(
-                      "ID: ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      document.get('id').toString(),
-                      style: const TextStyle(color: kPrimaryColor),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      "Giá: ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      document.get('price').toString(),
-                      style: const TextStyle(color: kPrimaryColor),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      "Loại: ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      document.get('type'),
-                      style: const TextStyle(color: kPrimaryColor),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Text(
-                      "Đơn vị: ",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      document.get('unit'),
-                      style: const TextStyle(color: kPrimaryColor),
-                    ),
-                  ],
-                ),
-              ]),
+              height: 130,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(children: [
+                  Row(
+                    children: [
+                      const Text(
+                        "ID: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        document.get('id').toString(),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Giá: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        document.get('price').toString(),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Loại: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        document.get('type'),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Đơn vị: ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        document.get('unit'),
+                        style: const TextStyle(color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  StatefulBuilder(
+                      builder: (context, dialogState) => SwitchListTile(
+                          value: isSoldOut,
+                          title: const Text(
+                            "Tạm hết: ",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onChanged: (ischanged) {
+                            dialogState(() {
+                              isSoldOut = !isSoldOut;
+                            });
+                            ManagerController managerController =
+                                ManagerController();
+                            managerController.setSoldOutStatus(document.id,isSoldOut);
+                          })),
+                ]),
+              ),
             ),
           ));
 }

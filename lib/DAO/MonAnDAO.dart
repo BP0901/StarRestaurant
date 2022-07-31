@@ -135,4 +135,29 @@ class MonAnDAO {
         .then((foods) => hasFood = foods.size);
     return hasFood;
   }
+
+  //Kiểm tra món có đang được gọi
+  Future<bool> isFoodOrdering(String id) async {
+    bool isOrdering = false;
+    await conllectionMADXN.where("idFood", isEqualTo: id).get().then((value) {
+      if (value.size > 0) isOrdering = true;
+    });
+    await FirebaseFirestore.instance
+        .collection('MonAnTamGoi')
+        .where("idFood", isEqualTo: id)
+        .get()
+        .then((value) {
+      if (value.size > 0) isOrdering = true;
+    });
+    return isOrdering;
+  }
+
+  setSoldOutStatus(String idFood, bool isSoldOut) {
+    conllectionMonAn
+        .doc(idFood)
+        .update({'isSoldOut': isSoldOut})
+        .catchError((onError) =>
+            Fluttertoast.showToast(msg: "Có lỗi xin kiểm tra lại!"))
+        .whenComplete(() => Fluttertoast.showToast(msg: "Thành công!"));
+  }
 }

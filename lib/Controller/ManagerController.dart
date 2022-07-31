@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:star_restaurant/DAO/ImageUpload.dart';
 import 'package:star_restaurant/DAO/LoaiMonAnDAO.dart';
 import 'package:star_restaurant/DAO/MonAnDAO.dart';
@@ -30,12 +29,22 @@ class ManagerController {
 
   void deleteTable(
       String id, Function onSuccess, Function(String) onfailure) async {
-    banAnDAO.deleteTable(id, onSuccess, onfailure);
+    int foodInTable = await monAnDAO.foodInTable(id);
+    if (foodInTable == 0) {
+      banAnDAO.deleteTable(id, onSuccess, onfailure);
+    } else {
+      onfailure("Bàn hiện tại đang có món ăn. Không thể xóa!");
+    }
   }
 
   void deleteFood(
       String id, Function onSuccess, Function(String) onfailure) async {
-    monAnDAO.delete(id, onSuccess, onfailure);
+    bool check = await monAnDAO.isFoodOrdering(id);
+    if (check) {
+      onfailure("Món ăn hiện đang được chọn. Không thể xóa!");
+    } else {
+      monAnDAO.delete(id, onSuccess, onfailure);
+    }
   }
 
   void addTable(String name, bool type, Function onSuccess,
@@ -71,4 +80,7 @@ class ManagerController {
   }
 
   Future<List<LoaiMonAn>> getListCates() async => loaiMonAnDAO.getLisstCates();
+
+  void setSoldOutStatus(String idFood, bool isSoldOut) =>
+      monAnDAO.setSoldOutStatus(idFood, isSoldOut);
 }

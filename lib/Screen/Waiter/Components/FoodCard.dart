@@ -6,6 +6,7 @@ import '../../../Util/Constants.dart';
 
 Widget buildVerticalFood(int index, DocumentSnapshot? document) {
   if (document != null) {
+    bool isSoldOut = document.get('isSoldOut');
     return Padding(
       padding: const EdgeInsets.all(kDefaultPadding),
       child: Container(
@@ -15,18 +16,36 @@ Widget buildVerticalFood(int index, DocumentSnapshot? document) {
             padding: const EdgeInsets.all(kDefaultPadding),
             child: Column(
               children: [
-                Material(
-                  child: Image.network(
-                    document.get('image'),
-                    errorBuilder: (context, object, stackTrace) {
-                      return Image.asset(
-                        "assets/images/img_not_available.jpeg",
-                      );
-                    },
+                Stack(children: [
+                  Material(
+                    child: Image.network(
+                      document.get('image'),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, object, stackTrace) {
+                        return Image.asset(
+                          "assets/images/img_not_available.jpeg",
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  clipBehavior: Clip.hardEdge,
-                ),
+                  Visibility(
+                      visible: isSoldOut,
+                      child: SizedBox(
+                        height: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Image.asset(
+                              "assets/images/soldout.png",
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                        ),
+                      )),
+                ]),
                 Padding(
                   padding: const EdgeInsets.only(top: kDefaultPadding / 2),
                   child: Container(
@@ -65,6 +84,7 @@ Widget buildVerticalFoodByCateItem(
     int index, DocumentSnapshot? document, String findingValue) {
   if (document != null &&
       document.get('name').toString().toLowerCase().contains(findingValue)) {
+    bool isSoldOut = document.get('isSoldOut');
     return Padding(
       padding: const EdgeInsets.all(kDefaultPadding),
       child: Container(
@@ -74,18 +94,36 @@ Widget buildVerticalFoodByCateItem(
             padding: const EdgeInsets.all(kDefaultPadding),
             child: Column(
               children: [
-                Material(
-                  child: Image.network(
-                    document.get('image'),
-                    errorBuilder: (context, object, stackTrace) {
-                      return Image.asset(
-                        "assets/images/img_not_available.jpeg",
-                      );
-                    },
+                Stack(children: [
+                  Material(
+                    child: Image.network(
+                      document.get('image'),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, object, stackTrace) {
+                        return Image.asset(
+                          "assets/images/img_not_available.jpeg",
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
-                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                  clipBehavior: Clip.hardEdge,
-                ),
+                  Visibility(
+                      visible: isSoldOut,
+                      child: SizedBox(
+                        height: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Image.asset(
+                              "assets/images/soldout.png",
+                              fit: BoxFit.cover,
+                            ),
+                          ],
+                        ),
+                      )),
+                ]),
                 Container(
                   decoration: const BoxDecoration(color: kSecondaryColor),
                   child: Column(
