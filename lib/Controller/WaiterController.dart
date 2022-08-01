@@ -73,8 +73,8 @@ class WaiterController {
     }
   }
 
-  void updateOrderedFoodAmount(MonAnDaGoi monAn, String idTable, int amount,
-      Function onSuccess, Function(String) onfailure) {
+  Future<void> updateOrderedFoodAmount(MonAnDaGoi monAn, String idTable,
+      int amount, Function onSuccess, Function(String) onfailure) async {
     if (monAn.status == "cooking") {
       onfailure("Món đang được làm. Không thể thây đổi!");
       return;

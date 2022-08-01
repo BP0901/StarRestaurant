@@ -168,23 +168,25 @@ class BanAnDAO {
     });
   }
 
-  void createTable(String name, bool type, Function onSuccess,
-      Function(String) onRegisterError) {
+  void createTable(String name, bool type) {
     _refBanAn.add({
       'name': name,
       'type': type,
     }).then((documentSnapshot) {
-      FirebaseFirestore.instance
-          .collection('BanAn')
-          .doc(documentSnapshot.id)
-          .update({
+      _refBanAn.doc(documentSnapshot.id).update({
         'id': documentSnapshot.id,
       });
+      _refBanDanSuDung.doc(documentSnapshot.id).set({
+        'idTable': documentSnapshot.id,
+        'idUser': "",
+        'isMerging': "",
+        'isPaying': false
+      });
       print("Thêm mới thành công: ${documentSnapshot.id}");
-      onSuccess();
+      Fluttertoast.showToast(msg: "Thêm thành công!");
     }).catchError((err) {
       print("err: " + err.toString());
-      onRegisterError("SignUp fail, please try again");
+      Fluttertoast.showToast(msg: "Thêm thất bại. Xin kiểm tra lại!");
     }).whenComplete(() {
       print("completed");
     });

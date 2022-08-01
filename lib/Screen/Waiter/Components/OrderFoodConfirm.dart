@@ -434,7 +434,7 @@ class _OrderFoodConfirmState extends State<OrderFoodConfirm> {
                     onPressed: () {
                       waiterController.deleteConfirmFoodinTable(
                           snapshot.data!.docs[index],
-                          widget.tableFood!.get('id'), () {
+                          widget.tableFood!.get('idTable'), () {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(

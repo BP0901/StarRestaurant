@@ -47,13 +47,8 @@ class ManagerController {
     }
   }
 
-  void addTable(String name, bool type, Function onSuccess,
-      Function(String) onfailure) async {
-    String password = '123456';
-    try {
-      banAnDAO.createTable(name, type, onSuccess, onfailure);
-    } catch (e) {}
-  }
+  void addTable(String name, bool type) async =>
+      banAnDAO.createTable(name, type);
 
   void updateStaff(String id, String name, int gender, DateTime birth,
       String role, Function onSuccess, Function(String) onfailure) {

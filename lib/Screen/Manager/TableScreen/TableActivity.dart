@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:star_restaurant/Util/Constants.dart';
 import '../../../Components/flash_message.dart';
 import '../components/DrawerMGTM.dart';
@@ -40,143 +41,119 @@ class _TablePage extends State<TablePage> {
 
   void _onButtonShowModalSheet() {
     showModalBottomSheet(
+        isScrollControlled: true,
         context: context,
         builder: (context) {
-          return Column(
-            children: <Widget>[
-              Container(
-                  padding: const EdgeInsets.all(10),
-                  child: TextField(
-                    decoration: const InputDecoration(labelText: 'Name'),
-                    controller: _contentController,
-                    onChanged: (text) {
-                      setState(() {
-                        _name = text;
-                      });
-                    },
-                  )),
-              const Divider(),
-              Container(
-                padding: const EdgeInsets.only(left: 15, right: 20),
-                child: Row(
-                  children: [
-                    const Text(
-                      'Loại bàn: ',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                    Row(
-                      children: [
-                        Radio(
-                            value: 0,
-                            groupValue: _radioVal,
-                            onChanged: (int? value) {
-                              setState(() =>
-                                  _radioVal = int.parse(value.toString()));
-                            }),
-                        const Text(
-                          'Thường',
-                          style: TextStyle(color: Colors.black),
-                        ),
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: SizedBox(
+              height: 270,
+              child: Column(
+                children: <Widget>[
+                  Container(
+                      padding: const EdgeInsets.all(10),
+                      child: TextField(
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        controller: _contentController,
+                      )),
+                  const Divider(),
+                  Container(
+                    padding: const EdgeInsets.only(left: 15, right: 20),
+                    child: StatefulBuilder(builder: (context, innerSetState) {
+                      return Row(
+                        children: [
+                          const Text(
+                            'Loại bàn: ',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          Row(
+                            children: [
+                              Radio(
+                                  value: 0,
+                                  groupValue: _radioVal,
+                                  onChanged: (int? value) =>
+                                      innerSetState(() => _radioVal = value!)),
+                              const Text(
+                                'Thường',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Radio(
+                                  value: 1,
+                                  groupValue: _radioVal,
+                                  onChanged: (int? value) =>
+                                      innerSetState(() => _radioVal = value!)),
+                              const Text(
+                                'Vip',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
+                  const Divider(),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Expanded(
+                            child: SizedBox(
+                          child: RaisedButton(
+                              color: Colors.teal,
+                              child: const Text(
+                                'Save',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
+                              ),
+                              onPressed: () {
+                                _name = _contentController.text.trim();
+                                if (_name.isEmpty) {
+                                  Fluttertoast.showToast(
+                                      msg: "Nhập tên bàn ăn!");
+                                  return;
+                                }
+                                controller.addTable(
+                                    _name, _radioVal != 1 ? false : true);
+                              }),
+                          height: 50,
+                        )),
+                        const Padding(padding: EdgeInsets.only(left: 10)),
+                        Expanded(
+                            child: SizedBox(
+                          child: RaisedButton(
+                            color: Colors.pinkAccent,
+                            child: const Text(
+                              'Cancel',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                            onPressed: () {
+                              print('Press cancel');
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                          height: 50,
+                        ))
                       ],
                     ),
-                    Row(
-                      children: [
-                        Radio(
-                            value: 1,
-                            groupValue: _radioVal,
-                            onChanged: (int? value) {
-                              setState(() =>
-                                  _radioVal = int.parse(value.toString()));
-                            }),
-                        const Text(
-                          'Vip',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                  //ok button
+                ],
               ),
-              const Divider(),
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Expanded(
-                        child: SizedBox(
-                      child: RaisedButton(
-                        color: Colors.teal,
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                        onPressed: () {
-                          print('press Save');
-                          setState(() {
-                            controller.addTable(
-                                _name, _radioVal != 1 ? false : true, () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: FlashMessageScreen(
-                                      type: "Thông báo",
-                                      content: "Thêm thành công!",
-                                      color: Colors.green),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.transparent,
-                                  elevation: 0,
-                                ),
-                              );
-                            }, (msg) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: FlashMessageScreen(
-                                      type: "Thông báo",
-                                      content: msg,
-                                      color: kPrimaryColor),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Colors.transparent,
-                                  elevation: 0,
-                                ),
-                              );
-                              Navigator.pop(context);
-                            });
-                          });
-                          //dismiss after inserting
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      height: 50,
-                    )),
-                    const Padding(padding: EdgeInsets.only(left: 10)),
-                    Expanded(
-                        child: SizedBox(
-                      child: RaisedButton(
-                        color: Colors.pinkAccent,
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                        onPressed: () {
-                          print('Press cancel');
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      height: 50,
-                    ))
-                  ],
-                ),
-              ),
-              //ok button
-            ],
+            ),
           );
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    final int index = 10;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: kAppBarColor,
@@ -184,9 +161,7 @@ class _TablePage extends State<TablePage> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.add),
-              onPressed: () {
-                this._onButtonShowModalSheet();
-              },
+              onPressed: () => _onButtonShowModalSheet(),
             )
           ],
         ),
@@ -226,19 +201,40 @@ class _TablePage extends State<TablePage> {
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
-                  title: const Text('Xác nhận xóa'),
-                  content: Text('Bạn có muốn xóa ${document?.get('name')}'),
+                  backgroundColor: kSecondaryColor,
+                  title: const Text(
+                    'Xác nhận xóa',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  content: Text(
+                    'Bạn có muốn xóa ${document?.get('name')}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
                   actions: <Widget>[
                     FlatButton(
-                        onPressed: () => Navigator.pop(context, 'Cancel'),
-                        child: const Text('Cancel')),
+                        onPressed: () => Navigator.pop(context, 'Không'),
+                        child: const Text(
+                          'Không',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        )),
                     FlatButton(
-                        onPressed: () => Navigator.pop(context, 'OK'),
-                        child: const Text('OK'))
+                        onPressed: () => Navigator.pop(context, 'Có'),
+                        child: const Text(
+                          'Có',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ))
                   ],
                 )).then((value) {
           if (value != null) {
-            if (value == 'OK') {
+            if (value == 'Có') {
               controller.deleteTable(document?.get('id'), () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -261,7 +257,6 @@ class _TablePage extends State<TablePage> {
                     elevation: 0,
                   ),
                 );
-                Navigator.pop(context);
               });
             }
           }
@@ -273,9 +268,7 @@ class _TablePage extends State<TablePage> {
       child: Card(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          color: document?.get('isUsing') != false
-              ? kPrimaryColor
-              : kSecondaryColor,
+          color: kSecondaryColor,
           elevation: 10,
           //this lesson will customize this ListItem, using Column and Row
           child: Row(

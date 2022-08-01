@@ -39,7 +39,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
           child: Column(children: [
             _headerPage(_tableFood),
             FutureBuilder<List<DocumentSnapshot>>(
-                future: listFoods,
+                future: _getData(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(
@@ -392,22 +392,22 @@ class _FoodOrderedState extends State<FoodOrdered> {
       WaiterController waiterController, MonAnDaGoi monAn, int index) {
     return showDialog(
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (confirmDialog) => AlertDialog(
               backgroundColor: kSupColor,
               content: const Text("Bạn có chắc muốn xóa!",
                   style: TextStyle(color: Colors.white)),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(confirmDialog),
                     child: const Text(
                       "Không",
                       style: TextStyle(color: kPrimaryColor),
                     )),
                 TextButton(
                     onPressed: () {
+                      Navigator.pop(confirmDialog);
                       waiterController.deleteOrderedFoodinTable(
-                          monAn, widget.tableFood!.get('id'), () {
-                        Navigator.pop(context);
+                          monAn, widget.tableFood!.get('idTable'), () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: FlashMessageScreen(
@@ -431,8 +431,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
                             elevation: 0,
                           ),
                         );
-                        Navigator.pop(context);
                       });
+                      setState(() {});
                     },
                     child: const Text(
                       "Có",
@@ -452,7 +452,8 @@ class _FoodOrderedState extends State<FoodOrdered> {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
         builder: (context) => StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) => SizedBox(
+              builder: (BuildContext context, StateSetter setBottomState) =>
+                  SizedBox(
                 height: 170,
                 child: Padding(
                   padding: const EdgeInsets.all(kDefaultPadding),
@@ -485,7 +486,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                           ),
                           IconButton(
                               onPressed: () {
-                                setState(() {
+                                setBottomState(() {
                                   if (_amount != 1) {
                                     _amount -= 1;
                                   }
@@ -502,7 +503,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                           ),
                           IconButton(
                               onPressed: () {
-                                setState(() {
+                                setBottomState(() {
                                   _amount += 1;
                                 });
                               },
@@ -519,7 +520,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                             style: ElevatedButton.styleFrom(
                               primary: kPrimaryColor,
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               waiterController.updateOrderedFoodAmount(
                                   monAn, widget.tableFood!.id, _amount, () {
                                 Navigator.pop(context);
@@ -548,6 +549,7 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                   ),
                                 );
                               });
+                              setState(() {});
                             },
                             child: const Text(
                               "Cập nhật",

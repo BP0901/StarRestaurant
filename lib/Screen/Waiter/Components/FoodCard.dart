@@ -7,6 +7,7 @@ import '../../../Util/Constants.dart';
 Widget buildVerticalFood(int index, DocumentSnapshot? document) {
   if (document != null) {
     bool isSoldOut = document.get('isSoldOut');
+    bool isSale = document.get('discount') == 0 ? false : true;
     return Padding(
       padding: const EdgeInsets.all(kDefaultPadding),
       child: Container(
@@ -16,36 +17,53 @@ Widget buildVerticalFood(int index, DocumentSnapshot? document) {
             padding: const EdgeInsets.all(kDefaultPadding),
             child: Column(
               children: [
-                Stack(children: [
-                  Material(
-                    child: Image.network(
-                      document.get('image'),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, object, stackTrace) {
-                        return Image.asset(
-                          "assets/images/img_not_available.jpeg",
-                          fit: BoxFit.cover,
-                        );
-                      },
+                Center(
+                  child: Stack(children: [
+                    Material(
+                      child: Image.network(
+                        document.get('image'),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, object, stackTrace) {
+                          return Image.asset(
+                            "assets/images/img_not_available.jpeg",
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(8.0)),
+                      clipBehavior: Clip.hardEdge,
                     ),
-                    borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                  Visibility(
-                      visible: isSoldOut,
-                      child: SizedBox(
-                        height: 100,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Image.asset(
-                              "assets/images/soldout.png",
-                              fit: BoxFit.cover,
-                            ),
-                          ],
-                        ),
-                      )),
-                ]),
+                    Visibility(
+                        visible: isSoldOut,
+                        child: SizedBox(
+                          height: 100,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Image.asset(
+                                "assets/images/soldout.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ],
+                          ),
+                        )),
+                    Visibility(
+                        visible: isSale,
+                        child: SizedBox(
+                          height: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                "assets/images/sales.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ],
+                          ),
+                        )),
+                  ]),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: kDefaultPadding / 2),
                   child: Container(
