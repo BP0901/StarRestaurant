@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:star_restaurant/Components/primary_button.dart';
@@ -40,7 +41,9 @@ class _LoginActivityState extends State<LoginActivity> {
           LoadingDialog.hideLoadingDialog(context);
           Get.to(const ManagerActivity());
         } else if (role == "waiter") {
-          await FirebaseMessaging.instance.subscribeToTopic("food");
+          if (!kIsWeb) {
+            await FirebaseMessaging.instance.subscribeToTopic("food");
+          }
           LoadingDialog.hideLoadingDialog(context);
           Get.to(const WaiterActivity());
         } else if (role == "cashier") {
@@ -59,8 +62,6 @@ class _LoginActivityState extends State<LoginActivity> {
 
   @override
   Widget build(BuildContext context) {
-    _usernameController.text = "waiter1";
-    _passwordController.text = "123456";
     return Scaffold(
       body: Stack(
         children: <Widget>[

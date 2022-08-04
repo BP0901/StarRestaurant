@@ -1,28 +1,25 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:star_restaurant/Controller/MessagingController.dart';
 import 'package:star_restaurant/Screen/Login/LoginActivity.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MessagingController.initialize();
-  await Firebase.initializeApp();
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  _messaging.unsubscribeFromTopic("food");
-  NotificationSettings settings = await _messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  if (!kIsWeb) {
+    _messaging.unsubscribeFromTopic("food");
+  }
 
-  // print('User granted permission: ${settings.authorizationStatus}');
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     if (message.notification != null) {
       print(message.notification!.title);

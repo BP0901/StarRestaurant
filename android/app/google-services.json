@@ -29,6 +29,13 @@
             {
               "client_id": "410381691609-99bd9sudbhi1kh3emu2tuo3c1fc8mqlc.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "410381691609-7p2hlthrjutvo9m1pc73fndidt78a7l6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.starRestaurant"
+              }
             }
           ]
         }
