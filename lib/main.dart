@@ -21,10 +21,10 @@ void main() async {
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    if (message.notification != null) {
-      print(message.notification!.title);
-      print(message.notification!.body);
-    }
+    // if (message.notification != null) {
+    //   print(message.notification!.title);
+    //   print(message.notification!.body);
+    // }
     MessagingController.display(message);
   });
   runApp(const MyApp());

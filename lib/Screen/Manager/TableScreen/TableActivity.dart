@@ -43,7 +43,7 @@ class _TablePage extends State<TablePage> {
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-        builder: (context) {
+        builder: (bottomDialog) {
           return Padding(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -121,6 +121,7 @@ class _TablePage extends State<TablePage> {
                                 }
                                 controller.addTable(
                                     _name, _radioVal != 1 ? false : true);
+                                Navigator.pop(bottomDialog);
                               }),
                           height: 50,
                         )),

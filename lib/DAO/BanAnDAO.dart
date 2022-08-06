@@ -193,11 +193,8 @@ class BanAnDAO {
   }
 
   void deleteTable(String id, Function onSuccess, Function(String) onfailure) {
-    FirebaseFirestore.instance
-        .collection('BanAn')
-        .doc(id)
-        .delete()
-        .then((value) {
+    _refBanDanSuDung.doc(id).delete();
+    _refBanAn.doc(id).delete().then((value) {
       print("Xóa thành công!");
       onSuccess();
     }).catchError((onError) {

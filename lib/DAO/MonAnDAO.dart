@@ -27,13 +27,11 @@ class MonAnDAO {
       Function(String) onError) async {
     return await conllectionMADXN
         .doc(doc.id)
-        .update({
-          'status': 'cancel',
-        })
+        .delete()
         .then((value) => onSuccess())
         .catchError((onError) {
-          onError("Hủy thất bại");
-        });
+      onError("Hủy thất bại");
+    });
   }
 
   Future success(QueryDocumentSnapshot<Object?> doc, Function onSuccess,
@@ -51,6 +49,7 @@ class MonAnDAO {
 
   Future add(MonAn monAn) {
     return conllectionMonAn.add({
+      'isSoldOut': false,
       'name': monAn.name,
       'image': monAn.image,
       'price': monAn.price,
@@ -78,7 +77,7 @@ class MonAnDAO {
           'discount': monAn.discount,
           'type': monAn.type,
           'unit': monAn.unit
-        })
+        }, SetOptions(merge: true))
         .then((value) => Fluttertoast.showToast(msg: "Cập Nhật thành công"))
         .catchError(
             (onError) => Fluttertoast.showToast(msg: onError.toString()))
@@ -133,6 +132,13 @@ class MonAnDAO {
         .where('idTable', isEqualTo: idTable)
         .get()
         .then((foods) => hasFood = foods.size);
+    if (hasFood == 0) {
+      await FirebaseFirestore.instance
+          .collection('MonAnTamGoi')
+          .where('idTable', isEqualTo: idTable)
+          .get()
+          .then((foods) => hasFood = foods.size);
+    }
     return hasFood;
   }
 

@@ -27,8 +27,6 @@ class _StaffPage extends State<StaffPage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    //In this lesson, we need to add AppBar and more "Add" button
-    //This must be Scaffold!. not MaterialApp !
     return Scaffold(
       drawer: const DrawerMGTM(),
       appBar: AppBar(

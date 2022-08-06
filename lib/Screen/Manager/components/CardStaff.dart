@@ -23,7 +23,7 @@ Widget buildStaffItem(BuildContext context, int index,
     if (document != null) {
       return GestureDetector(
         onLongPress: () {
-          _disableStaff(context, _name, document.id);
+          _disableStaff(context, _name, document.id, document.get('disable'));
         },
         onTap: () {
           _infoStaff(context, document.id, _name, _role, _gender, _locker,
@@ -106,7 +106,7 @@ Widget buildStaffItem(BuildContext context, int index,
         document.get('name').toString().toLowerCase().contains(value)) {
       return GestureDetector(
         onLongPress: () {
-          _disableStaff(context, _name, document.id);
+          _disableStaff(context, _name, document.id, document.get('disable'));
         },
         onTap: () {
           _infoStaff(context, document.id, _name, _role, _gender, _locker,
@@ -351,13 +351,15 @@ void _infoStaff(
       });
 }
 
-void _disableStaff(BuildContext context, String name, String id) {
+void _disableStaff(
+    BuildContext context, String name, String id, bool isDisabled) {
   ManagerController controller = ManagerController();
+  String lockOrUnlock = isDisabled ? "Mở" : "Khóa";
   showDialog(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Khóa/Mở tài khoản'),
-            content: Text('Bạn có muốn Khóa/Mở tài khoản: ${name}'),
+            content: Text('Bạn có muốn $lockOrUnlock tài khoản: $name'),
             actions: <Widget>[
               FlatButton(
                   onPressed: () => Navigator.pop(context, 'Cancel'),

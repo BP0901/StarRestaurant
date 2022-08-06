@@ -20,10 +20,12 @@ buildMenuButton(DocumentSnapshot? currentTableFood, BuildContext context,
       builder: (context, snapshot) {
         bool isMerging = false;
         bool isPaying = false;
+        bool isChangeable = true;
         if (snapshot.hasData) {
           isPaying = snapshot.data!.get("isPaying");
           if (snapshot.data!.get("isMerging") != "") {
             isMerging = true;
+            isUsingTable = false;
           }
         }
         if (isPaying) {
