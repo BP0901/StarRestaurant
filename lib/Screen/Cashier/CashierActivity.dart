@@ -61,8 +61,6 @@ class CashierActivity extends StatelessWidget {
                                         builder: (context, table) {
                                           String tableName =
                                               table.data?.get("name") ?? "Lỗi";
-                                          int total = 0;
-
                                           return GestureDetector(
                                             onTap: (() => Get.to(
                                                 BillDetailActivity(
@@ -119,30 +117,3 @@ class CashierActivity extends StatelessWidget {
     );
   }
 }
-
-
-
-//  Expanded(
-//               child: ListView.builder(
-//                 itemCount: 50,
-//                 itemBuilder: (context, index) {
-//                   return InkWell(
-//                     onTap: () =>
-//                         Get.to(PayInformationTable(name: "Bàn số $index")),
-//                     child: Row(
-//                       children: [
-//                         Expanded(
-//                             child: Padding(
-//                           padding: const EdgeInsets.fromLTRB(10, 12, 0, 12),
-//                           child: Text(
-//                             "bàn số $index",
-//                             style: const TextStyle(
-//                                 color: Colors.white, fontSize: 15),
-//                           ),
-//                         )),
-//                       ],
-//                     ),
-//                   );
-//                 },
-//               ),
-//             ),

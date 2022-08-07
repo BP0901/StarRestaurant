@@ -30,7 +30,6 @@ class _FoodOrderedState extends State<FoodOrdered> {
 
   @override
   Widget build(BuildContext context) {
-    var _idT = _tableFood!.id;
     WaiterController waiterController = WaiterController();
     return Scaffold(
       body: Material(
@@ -271,6 +270,9 @@ class _FoodOrderedState extends State<FoodOrdered> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
+                                                  setState(() {
+                                                    hasData = false;
+                                                  });
                                                   WaiterController
                                                       waiterController =
                                                       WaiterController();

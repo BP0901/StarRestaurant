@@ -20,7 +20,7 @@ class BillDetailActivity extends StatefulWidget {
 }
 
 class _BillDetailActivityState extends State<BillDetailActivity> {
-  CashierController _cashierController = CashierController();
+  final CashierController _cashierController = CashierController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,6 +89,8 @@ class _BillDetailActivityState extends State<BillDetailActivity> {
                                             ),
                                             TextButton(
                                               onPressed: () {
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
                                                 _cashierController
                                                     .confirmPayTheBill(
                                                         widget.bill, () {
@@ -107,7 +109,6 @@ class _BillDetailActivityState extends State<BillDetailActivity> {
                                                       elevation: 0,
                                                     ),
                                                   );
-                                                  Navigator.pop(context);
                                                 }, (msg) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(
@@ -125,7 +126,6 @@ class _BillDetailActivityState extends State<BillDetailActivity> {
                                                       elevation: 0,
                                                     ),
                                                   );
-                                                  Navigator.pop(context);
                                                 });
                                               },
                                               child: const Text(

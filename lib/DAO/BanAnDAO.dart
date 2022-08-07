@@ -326,7 +326,7 @@ class BanAnDAO {
       });
 
       // Chuyển trạng thái bàn thành đang thanh toán
-      _refBanDanSuDung.doc(idT).update({"isPaying": true});
+      _changTablesStatus(idT);
       onSuccess();
     }).catchError((onError) {
       print("err: " + onError.toString());
@@ -443,4 +443,22 @@ class BanAnDAO {
           });
         }
       });
+
+  Future<void> _changTablesStatus(String idT) async {
+    await _refBanDanSuDung.doc((idT)).get().then((value) {
+      if (value.get('isMerging') == "") {
+        _refBanDanSuDung.doc(idT).update({"isPaying": true});
+      } else {
+        FirebaseFirestore.instance
+            .collection("BanDangGhep")
+            .doc(value.get('isMerging'))
+            .get()
+            .then((mergedTables) {
+          List listidTable = mergedTables.data()!.values.toList();
+          listidTable.forEach((element) =>
+              _refBanDanSuDung.doc(element).update({"isPaying": true}));
+        });
+      }
+    });
+  }
 }

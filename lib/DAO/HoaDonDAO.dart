@@ -9,28 +9,50 @@ class HoaDonDAO {
       FirebaseFirestore.instance.collection("MonAnDaXacNhan");
   final User? _user = FirebaseAuth.instance.currentUser;
 
-  void confirmPayTheBill(
-      DocumentSnapshot? bill, Function onSuccess, Function(String) onfailure) {
+  Future<void> confirmPayTheBill(DocumentSnapshot? bill, Function onSuccess,
+      Function(String) onfailure) async {
     String idTable = bill!.get("idTable");
-    _refHoaDon
+    await _refHoaDon
         .doc(bill.id)
-        .update({"status": "paid", "idCashier": _user!.uid})
+        .update({"status": "paid", "idCashier": _user!.uid}).catchError(
+            (onError) => onfailure("Có lỗi. Xin kiểm tra lại!"));
+
+    await _refBanDangSuDung
+        .doc(idTable)
+        .get()
         .then((value) {
-          _refBanDangSuDung.doc(idTable).update({
-            "idUser": "",
-            "isPaying": false,
-          });
-          _refMonAnDaGoi
-              .where("idTable", isEqualTo: idTable)
-              .get()
-              .then((foods) => foods.docs.forEach((food) {
-                    _refMonAnDaGoi.doc(food.id).delete();
-                  }));
+          if (value.get("isMerging") != "") {
+            FirebaseFirestore.instance
+                .collection("BanDangGhep")
+                .doc(value.get("isMerging"))
+                .get()
+                .then((value) {
+              List listIdTables = value.data()!.values.toList();
+              listIdTables.forEach((idT) {
+                _refBanDangSuDung
+                    .doc(idT)
+                    .update({"idUser": "", "isPaying": false, "isMerging": ""});
+                _refMonAnDaGoi
+                    .where("idTable", isEqualTo: idT)
+                    .get()
+                    .then((foods) => foods.docs.forEach((food) {
+                          _refMonAnDaGoi.doc(food.id).delete();
+                        }));
+              });
+            });
+          } else {
+            _refBanDangSuDung
+                .doc(idTable)
+                .update({"idUser": "", "isPaying": false, "isMerging": ""});
+            _refMonAnDaGoi
+                .where("idTable", isEqualTo: idTable)
+                .get()
+                .then((foods) => foods.docs.forEach((food) {
+                      _refMonAnDaGoi.doc(food.id).delete();
+                    }));
+          }
         })
-        .whenComplete(() => onSuccess())
-        .catchError((onError) {
-          print("err: " + onError.toString());
-          onfailure("Có lỗi xẩy ra. Xin kiểm tra lại!");
-        });
+        .catchError((onError) => onfailure("Có lỗi. Xin kiểm tra lại!"))
+        .whenComplete(() => onSuccess());
   }
 }
