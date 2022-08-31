@@ -1,0 +1,11 @@
+Phần mền hỗ trợ quản lý nhà hàng gồm 4 loại tài khoản: quản lý, phục vụ, bếp, thu ngân.
+Chức năng các tài khoản trong ứng dụng:
+	Quản lý: quản lý thông tin tài khoản, loại món ăn, món ăn, bàn ăn.
+	Phục vụ: quản lý đặt món(món ăn gọi theo bàn), bàn ăn(ghéo bàn, hủy ghép), yêu cầu thanh toán.
+	Bếp: Quản lý các món ăn đã gọi(Xác nhận làm món ăn hoặc hủy khi không thể làm).
+	Thu ngân: Xác nhận thanh toán và in bill.
+Tài khoản đăng nhập demo:
+	Quản lý(username / password): manager1 / 123456
+	Phục vụ(username / password): waiter1 / 123456	, waiter2 / 123456
+	Bếp(username / password): chef1 / 123456
+	Thu ngân(username / password): cashier1 / 123456
